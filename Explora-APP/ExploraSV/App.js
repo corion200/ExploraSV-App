@@ -7,7 +7,7 @@ export default function App() {
       <StatusBar style="auto" />
       <View style={styles.landing}>
         <Image
-          source={{ uri: 'https://example.com/turismo-banner.jpg' }}
+          source={{ uri: './assets/fondo.jpg' }}
           style={styles.banner}
         />
         <Text style={styles.title}>Bienvenido a ExploraSV</Text>
