@@ -77,7 +77,6 @@ export default function App() {
 const styles = StyleSheet.create({
   slide: {
     width,
-    height: height,
     justifyContent: 'space-between',
     padding: 30,
   },
