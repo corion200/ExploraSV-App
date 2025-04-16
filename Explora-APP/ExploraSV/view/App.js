@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, FlatList, ImageBackground, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, ImageBackground, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import tw from './tw';
 
 const { width, height } = Dimensions.get('window');
 
@@ -53,81 +54,35 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={slides}
-        keyExtractor={(item) => item.key}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / width);
-          setCurrentIndex(index);
-        }}
-        renderItem={({ item }) => (
-          <ImageBackground source={item.image} style={styles.slide} resizeMode="cover">
-            <Text style={styles.skip} onPress={handleSkip}>Saltar</Text>
-            <View style={styles.textContainer}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.text}>{item.text}</Text>
-              <TouchableOpacity style={styles.button} onPress={handleNext}>
-                <Text style={styles.buttonText}>{item.button}</Text>
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-        )}
-      />
-    </SafeAreaView>
+    <FlatList
+      ref={flatListRef}
+      data={slides}
+      keyExtractor={(item) => item.key}
+      horizontal
+      pagingEnabled
+      showsHorizontalScrollIndicator={false}
+      onMomentumScrollEnd={(event) => {
+        const index = Math.round(event.nativeEvent.contentOffset.x / width);
+        setCurrentIndex(index);
+      }}
+      renderItem={({ item }) => (
+        <ImageBackground source={item.image} style={[tw`w-full justify-between p-8`, { width, height }]}>
+          <Text style={tw`self-end text-white font-bold mt-10 mr-2`} onPress={handleSkip}>
+            Saltar
+          </Text>
+          <View style={tw`items-center mb-16`}>
+            <Text style={tw`text-white text-2xl font-bold text-center mb-3`}>{item.title}</Text>
+            <Text style={tw`text-white text-base text-center mb-5`}>{item.text}</Text>
+            <TouchableOpacity 
+              style={tw`bg-primary py-2.5 px-8 rounded-full`} 
+              onPress={handleNext}
+            >
+              <Text style={tw`text-white font-bold`}>{item.button}</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      )}
+    />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000', // opcional para evitar parpadeos
-  },
-  slide: {
-    width,
-    height,
-    flex: 1,
-  },
-  skip: {
-    alignSelf: 'flex-end',
-    color: '#fff',
-    fontWeight: 'bold',
-    marginTop: 40,
-    marginRight: 20,
-    fontSize: 16,
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 30,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 26,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  text: {
-    color: '#fff',
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#1abc9c',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 25,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});

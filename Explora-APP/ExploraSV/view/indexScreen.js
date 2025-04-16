@@ -1,185 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import tw from './tw'; // Importamos nuestra instancia de Tailwind
 
-const IndexScreen = ({ isAuthenticated }) => {
-    const [userName, setUserName] = useState("Invitado");
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            setUserName("Juan Pérez");
-        }
-    }, [isAuthenticated]);
-
+const IndexScreen = () => {
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.container}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.greeting}>Hola, {userName}!</Text>
-                    <Text style={styles.subGreeting}>
-                        {isAuthenticated ? "¿Qué aventura nos espera hoy?" : "Bienvenido, por favor inicia sesión o regístrate"}
-                    </Text>
-                    <View style={styles.avatarPlaceholder}></View>
+        <ScrollView style={tw`flex-1 bg-white p-4`}>
+            {/* Header */}
+            <View style={tw`mb-4 flex-row justify-between items-center`}>
+                <View>
+                    <Text style={tw`text-lg font-bold`}>Hola, [Nombre]!</Text>
+                    <Text style={tw`text-sm text-gray-500`}>¿Qué aventura nos espera hoy?</Text>
                 </View>
+                <View style={tw`w-10 h-10 bg-gray-300 rounded-full`}></View>
+            </View>
 
-                {/* Banner */}
-                <View style={styles.banner}>
-                    <Text style={styles.bannerText}>{isAuthenticated ? "Reserva Ahora" : "Inicia sesión para reservar"}</Text>
-                    <Text style={styles.bannerSubText}>
-                        {isAuthenticated
-                            ? "Recibe una recompensa al hacer tu reserva con nosotros"
-                            : "Accede a nuestra plataforma para ver las opciones de reserva"}
-                    </Text>
-                    <TouchableOpacity style={styles.bannerButton} onPress={() => alert('Redirigiendo...')}>
-                        <Text style={styles.bannerButtonText}>{isAuthenticated ? "Reservar" : "Iniciar sesión"}</Text>
+            {/* Banner */}
+            <View style={tw`bg-blue-600 rounded-lg p-4 mb-4`}>
+                <Text style={tw`text-lg font-bold text-white`}>Reserva Ahora</Text>
+                <Text style={tw`text-sm text-white my-2`}>
+                    Recibe una recompensa al hacer tu reserva con nosotros
+                </Text>
+                <TouchableOpacity style={tw`bg-yellow-400 p-2 rounded self-start`}>
+                    <Text style={tw`text-sm font-bold text-black`}>Reservar</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Categorías */}
+            <Text style={tw`text-base font-bold my-2`}>Explora por categorías:</Text>
+            <View style={tw`flex-row justify-between mb-4`}>
+                {['Senderismo', 'Playas', 'Eco Turismo', 'Aventura'].map((category, index) => (
+                    <TouchableOpacity key={index} style={tw`items-center`}>
+                        <View style={tw`w-10 h-10 bg-gray-300 rounded-full mb-2`}></View>
+                        <Text style={tw`text-xs text-center`}>{category}</Text>
                     </TouchableOpacity>
-                </View>
+                ))}
+            </View>
 
-                {/* Categorías */}
-                <Text style={styles.sectionTitle}>Explora por categorías:</Text>
-                <View style={styles.categories}>
-                    {['Senderismo', 'Playas', 'Eco Turismo', 'Aventura'].map((category, index) => (
-                        <TouchableOpacity key={index} style={styles.category} onPress={() => alert(`Explorando ${category}`)}>
-                            <View style={styles.iconPlaceholder}></View>
-                            <Text style={styles.categoryText}>{category}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                {/* Lugares */}
-                <Text style={styles.sectionTitle}>Lugares que no te puedes perder:</Text>
-                <View style={styles.places}>
-                    {[{ name: 'Volcán de Izalco', location: 'Departamento de Sonsonate, El Salvador' }].map((place, index) => (
-                        <View key={index} style={styles.placeCard}>
-                            <View style={styles.imagePlaceholder}></View>
-                            <View style={styles.placeInfo}>
-                                <Text style={styles.placeName}>{place.name}</Text>
-                                <Text style={styles.placeLocation}>{place.location}</Text>
-                            </View>
-                            <TouchableOpacity style={styles.favoriteButton}>
-                                <View style={styles.iconPlaceholder}></View>
-                            </TouchableOpacity>
+            {/* Lugares */}
+            <Text style={tw`text-base font-bold my-2`}>Lugares que no te puedes perder:</Text>
+            <View style={tw`mb-4`}>
+                {[
+                    { name: 'Volcán de Izalco', location: 'Departamento de Sonsonate, El Salvador' },
+                    { name: 'El Boquerón', location: 'Departamento de San Salvador, El Salvador' },
+                ].map((place, index) => (
+                    <View key={index} style={tw`flex-row items-center mb-4 bg-gray-100 rounded-lg p-2`}>
+                        <View style={tw`w-16 h-16 bg-gray-300 rounded-lg mr-2`}></View>
+                        <View style={tw`flex-1`}>
+                            <Text style={tw`text-sm font-bold`}>{place.name}</Text>
+                            <Text style={tw`text-xs text-gray-500`}>{place.location}</Text>
                         </View>
-                    ))}
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                        <TouchableOpacity style={tw`p-2`}>
+                            <View style={tw`w-6 h-6 bg-gray-300 rounded-full`}></View>
+                        </TouchableOpacity>
+                    </View>
+                ))}
+            </View>
+        </ScrollView>
     );
 };
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    container: {
-        padding: 16,
-        paddingTop: Platform.OS === 'android' ? 25 : 0,
-        backgroundColor: '#fff',
-    },
-    header: {
-        marginBottom: 16,
-    },
-    greeting: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    subGreeting: {
-        fontSize: 14,
-        color: '#666',
-    },
-    avatarPlaceholder: {
-        width: 40,
-        height: 40,
-        backgroundColor: '#ddd',
-        borderRadius: 20,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-    },
-    banner: {
-        backgroundColor: '#0055FF',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 16,
-    },
-    bannerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    bannerSubText: {
-        fontSize: 14,
-        color: '#fff',
-        marginVertical: 8,
-    },
-    bannerButton: {
-        backgroundColor: '#FFD700',
-        padding: 8,
-        borderRadius: 4,
-        alignSelf: 'flex-start',
-    },
-    bannerButtonText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginVertical: 8,
-    },
-    categories: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    category: {
-        alignItems: 'center',
-    },
-    iconPlaceholder: {
-        width: 40,
-        height: 40,
-        backgroundColor: '#ddd',
-        borderRadius: 20,
-        marginBottom: 8,
-    },
-    categoryText: {
-        fontSize: 12,
-        textAlign: 'center',
-    },
-    places: {
-        marginBottom: 16,
-    },
-    placeCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-        padding: 8,
-    },
-    imagePlaceholder: {
-        width: 60,
-        height: 60,
-        backgroundColor: '#ddd',
-        borderRadius: 8,
-        marginRight: 8,
-    },
-    placeInfo: {
-        flex: 1,
-    },
-    placeName: {
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
-    placeLocation: {
-        fontSize: 12,
-        color: '#666',
-    },
-    favoriteButton: {
-        padding: 8,
-    },
-});
 
 export default IndexScreen;
