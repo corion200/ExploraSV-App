@@ -45,7 +45,7 @@ export default function App() {
     if (currentIndex < slides.length - 1) {
       flatListRef.current.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      navigation.navigate('Index');
+      navigation.navigate('SignUp');
     }
   };
 
@@ -66,20 +66,23 @@ export default function App() {
         setCurrentIndex(index);
       }}
       renderItem={({ item }) => (
-        <ImageBackground source={item.image} style={[tw`w-full justify-between p-8`, { width, height }]}>
-          <Text style={tw`self-end text-white font-bold mt-10 mr-2`} onPress={handleSkip}>
-            Saltar
-          </Text>
-          <View style={tw`items-center mb-16`}>
-            <Text style={tw`text-white text-2xl font-bold text-center mb-3`}>{item.title}</Text>
-            <Text style={tw`text-white text-base text-center mb-5`}>{item.text}</Text>
-            <TouchableOpacity 
-              style={tw`bg-primary py-2.5 px-8 rounded-full`} 
-              onPress={handleNext}
-            >
-              <Text style={tw`text-white font-bold`}>{item.button}</Text>
-            </TouchableOpacity>
+        <ImageBackground source={item.image} style={[tw`flex-1`, { width }]}  resizeMode="cover">
+          <View style={tw`flex-1 justify-center items-center bg-black/40`}>
+            <Text style={tw`absolute top-5 right-4 text-white font-bold mt-10 mr-2`} onPress={handleSkip}>
+                Saltar
+            </Text>
+            <View style={tw`items-center`}>
+              <Text style={tw`text-white text-4xl font-bold text-center p-5`}>{item.title}</Text>
+              <Text style={tw`text-white text-base/10 text-center p-5`}>{item.text}</Text>
+              <TouchableOpacity 
+                style={tw`bg-primary py-2.5 px-8 rounded-full`} 
+                onPress={handleNext}
+              >
+                <Text style={tw`text-black text-base/8 font-bold `}>{item.button}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+         
         </ImageBackground>
       )}
     />
