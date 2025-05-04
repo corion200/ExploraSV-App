@@ -2,12 +2,34 @@ import React, { useState } from 'react';
 import tw from './tw'; 
 import { View, Text, TextInput, TouchableOpacity, Image, StatusBar, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import api from '../api.js';
 
 const SignUp = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleRegister = async () => {
+    try {
+      const response = await api.post('/register', {
+        name: fullName,
+        email: email,
+        password: password,
+      });
+
+      const token = response.data.token;
+      if (token) {
+        await AsyncStorage.setItem('authToken', token);
+        console.log('Usuario registrado y autenticado');
+        // Navega a la pantalla deseada
+      } else {
+        console.log('Registrado, pero sin token');
+      }
+    } catch (error) {
+      console.error('Error en registro:', error.response?.data || error.message);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -83,9 +105,10 @@ const SignUp = () => {
                 </View>
               </View>
               
-              <TouchableOpacity style={tw`bg-primary py-4 rounded-xl shadow-md`}>
+              <TouchableOpacity style={tw`bg-primary py-4 rounded-xl shadow-md`} onPress={handleRegister}>
                 <Text style={tw`text-white text-center font-bold text-lg`}>Registrar</Text>
               </TouchableOpacity>
+
               
               {/* Login Link */}
               <View style={tw`flex-row justify-center mt-6`}>
