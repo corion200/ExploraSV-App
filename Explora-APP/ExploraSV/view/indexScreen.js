@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import tw from './tw'; 
+import List from "./components/InfoViews";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const IndexScreen = () => {
+
+    const [Nom_Cli, setNom_Cli] = useState('');
+
+    useEffect(() => {
+      const obtenerNombre = async () => {
+        try {
+            const usuario = await AsyncStorage.getItem('Turista');
+            if (usuario) {
+              const usuarioParseado = JSON.parse(usuario);
+              console.log('Usuario recuperado:', usuarioParseado);  // Verifica la estructura
+              setNom_Cli(usuarioParseado.Nom_Cli); // Asegúrate de que la propiedad 'nombre' esté presente
+            }
+          } catch (error) {
+            console.error('Error al obtener el nombre del usuario:', error);
+          }
+        };
+      
+  
+      obtenerNombre();
+    }, []);
+  
     return (
         <ScrollView style={tw`flex-1 bg-gray-50`}>
             <SafeAreaView style={tw`p-4`}>
                 {/* Header */}
                 <View style={tw`mb-6 flex-row justify-between items-center`}>
                     <View>
-                        <Text style={tw`text-xl font-bold text-gray-800`}>Hola, [Nombre]!</Text>
+                        <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Cargando...'}!</Text>
                         <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
                     </View>
                     <TouchableOpacity>
@@ -50,28 +74,7 @@ const IndexScreen = () => {
 
                 {/* Lugares */}
                 <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
-                <View style={tw`mb-6`}>
-                    {[
-                        { name: 'Volcán de Izalco', location: 'Departamento de Sonsonate, El Salvador', icon: 'volcano' },
-                        { name: 'El Boquerón', location: 'Departamento de San Salvador, El Salvador', icon: 'mountain' },
-                    ].map((place, index) => (
-                        <View key={index} style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}>
-                            <View style={tw`w-16 h-16 bg-gray-200 rounded-lg mr-3 items-center justify-center`}>
-                                <Icon name={place.icon} size={32} color="#4B5563" />
-                            </View>
-                            <View style={tw`flex-1`}>
-                                <Text style={tw`text-sm font-bold text-gray-800`}>{place.name}</Text>
-                                <View style={tw`flex-row items-center`}>
-                                    <Icon name="map-marker" size={12} color="#6B7280" style={tw`mr-1`} />
-                                    <Text style={tw`text-xs text-gray-600`}>{place.location}</Text>
-                                </View>
-                            </View>
-                            <TouchableOpacity style={tw`p-2`}>
-                                <Icon name="heart-outline" size={24} color="#6B7280" />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
-                </View>
+                <List/>
 
                 {/* Botón flotante */}
                 <TouchableOpacity 

@@ -54,7 +54,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1`}>
+    <SafeAreaView style={tw`flex-1 p-4`}>
       <FlatList
         ref={flatListRef}
         data={slides}
