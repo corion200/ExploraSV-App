@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import tw from '../tw'; 
-import { SafeAreaView } from 'react-native-safe-area-context';//TODAVIA NO LO USO
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';//TODAVIA NO LO USO
 export default function List() {
@@ -10,7 +9,6 @@ export default function List() {
         <View style={tw`mb-6`}>
         {[
             { name: 'Volcán de Izalco', location: 'Departamento de Sonsonate, El Salvador',  },
-            { name: 'El Boquerón', location: 'Departamento de San Salvador, El Salvador', },
         ].map((place, index) => (
             <View key={index} style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}>
                 <View style={tw`w-16 h-16 bg-gray-200 rounded-lg mr-3 items-center justify-center`}>
@@ -28,6 +26,6 @@ export default function List() {
                 </TouchableOpacity>
             </View>
         ))}
-    </View>
+        </View>
     );
   }
