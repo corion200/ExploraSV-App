@@ -6,7 +6,6 @@ import { login, getCurrentUser } from '../auth';
 import { useNavigation } from '@react-navigation/native';
 
 
-
 const SignIn = () => {
   const navigation = useNavigation();
   const [Correo_Cli, setCorreo_Cli] = useState('');

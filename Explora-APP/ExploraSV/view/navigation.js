@@ -5,6 +5,7 @@ import Landing from './App';
 import SignUp from './signUp';
 import Index from './indexScreen';
 import Login from './login';
+import Site from './site';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function Navigation() {
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Site" component={Site} />
       </Stack.Navigator>
     </NavigationContainer>
   );
