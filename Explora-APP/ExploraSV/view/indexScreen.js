@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const IndexScreen = () => {
-
+    const navigation = useNavigation();
     const [Nom_Cli, setNom_Cli] = useState('');
 
     useEffect(() => {
@@ -16,18 +17,16 @@ const IndexScreen = () => {
             const usuario = await AsyncStorage.getItem('Turista');
             if (usuario) {
               const usuarioParseado = JSON.parse(usuario);
-              console.log('Usuario recuperado:', usuarioParseado);  // Verifica la estructura
-              setNom_Cli(usuarioParseado.Nom_Cli); // Asegúrate de que la propiedad 'nombre' esté presente
+              console.log('Usuario recuperado:', usuarioParseado);
+              setNom_Cli(usuarioParseado.Nom_Cli);
             }
           } catch (error) {
             console.error('Error al obtener el nombre del usuario:', error);
           }
         };
-      
-  
       obtenerNombre();
     }, []);
-  
+
     return (
         <ScrollView style={tw`flex-1 bg-gray-50`}>
             <SafeAreaView style={tw`p-4`}>
@@ -74,7 +73,7 @@ const IndexScreen = () => {
 
                 {/* Lugares */}
                 <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
-                <List/>
+                <List navigation={navigation} />
 
                 {/* Botón flotante */}
                 <TouchableOpacity 
