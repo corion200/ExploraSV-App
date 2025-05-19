@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './api';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {
@@ -27,29 +29,41 @@ export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confi
   }
 }
 
-export async function login(Correo_Cli, Contra_Cli) {
-    try {
-      const response = await api.post('login', {
-        Correo_Cli,
-        Contra_Cli,
-      });
-  
-      const { token, Turista } = response.data;
-  
-      if (token && Turista) {
-        // Guardamos token y usuario en AsyncStorage
-        await AsyncStorage.setItem('token', token);
-        await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
-        console.log('Login exitoso:', Turista);
-        return response.data;
-      } else {
-        throw new Error('Datos incompletos recibidos del servidor');
+export async function login(Correo_Cli, Contra_Cli,navigation ) {
+  try {
+    
+    const response = await api.post('login', {
+      Correo_Cli,
+      Contra_Cli,
+    });
+
+    const { token, Turista  } = response.data;
+
+    if (token && Turista) {
+      // Guardar usuario en AsyncStorage
+      await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
+
+      console.log('Login exitoso:', Turista);
+
+      // Redirigir a pantalla principal
+      if (navigation && typeof navigation.reset === 'function') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Index' }],
+        });
+      } else if (navigation && typeof navigation.navigate === 'function') {
+        navigation.navigate('Index');
       }
-    } catch (error) {
-      console.error('Error al hacer login:', error.response?.data || error.message);
-      return null;
+
+      return response.data;
+    } else {
+      throw new Error('Datos incompletos recibidos del servidor');
     }
+  } catch (error) {
+    console.error('Error al hacer login:', error.response?.data || error.message);
+    return null;
   }
+}
 
   export async function getCurrentUser() {
     try {
@@ -58,5 +72,22 @@ export async function login(Correo_Cli, Contra_Cli) {
     } catch (error) {
       console.error('Error al obtener usuario:', error.message);
       return null;
+    }
+  }
+
+  // Cerrar sesión
+  export async function logout(navigation) {
+    try {
+      await AsyncStorage.removeItem('Turista');
+      console.log('Sesión cerrada correctamente');
+  
+      if (navigation && typeof navigation.reset === 'function') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error.message);
     }
   }

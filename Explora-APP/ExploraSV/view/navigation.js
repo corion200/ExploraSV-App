@@ -6,6 +6,7 @@ import SignUp from './signUp';
 import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
+import AuthLoading from './AuthLoading';
 
 const Stack = createStackNavigator();
 
@@ -13,6 +14,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="AuthLoading" component={AuthLoading} />
         <Stack.Screen name="Landing" component={Landing} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Index" component={Index} />

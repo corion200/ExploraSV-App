@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView,Button } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logout } from '../auth';
 
-const IndexScreen = () => {
+
+
+const IndexScreen = ({ navigation }) => {
 
     const [Nom_Cli, setNom_Cli] = useState('');
 
@@ -27,6 +30,15 @@ const IndexScreen = () => {
   
       obtenerNombre();
     }, []);
+
+    //cerrar sesión 
+    const cerrarSesion = async () => {
+        try {
+          await logout(navigation);
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error.message);
+        }
+      };
   
     return (
         <ScrollView style={tw`flex-1 bg-gray-50`}>
@@ -34,12 +46,13 @@ const IndexScreen = () => {
                 {/* Header */}
                 <View style={tw`mb-6 flex-row justify-between items-center`}>
                     <View>
-                        <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Cargando...'}!</Text>
+                        <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Turista'}!</Text>
                         <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
                     </View>
-                    <TouchableOpacity>
+                    <View style={tw`items-center`}>
                         <Icon name="account-circle" size={40} color="#6B7280" />
-                    </TouchableOpacity>
+                        <Button title="Cerrar sesión" color="red" onPress={cerrarSesion} />
+                    </View>
                 </View>
 
                 {/* Banner */}
@@ -76,13 +89,8 @@ const IndexScreen = () => {
                 <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
                 <List/>
 
-                {/* Botón flotante */}
-                <TouchableOpacity 
-                    style={tw`absolute bottom-6 right-6 w-16 h-16 bg-blue-500 rounded-full items-center justify-center shadow-lg`}
-                    onPress={() => console.log('Búsqueda presionada')}
-                >
-                    <Icon name="magnify" size={28} color="white" />
-                </TouchableOpacity>
+                
+                
             </SafeAreaView>
         </ScrollView>
     );
