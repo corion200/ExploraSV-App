@@ -19,15 +19,13 @@ const IndexScreen = ({ navigation }) => {
             const usuario = await AsyncStorage.getItem('Turista');
             if (usuario) {
               const usuarioParseado = JSON.parse(usuario);
-              console.log('Usuario recuperado:', usuarioParseado);  // Verifica la estructura
-              setNom_Cli(usuarioParseado.Nom_Cli); // Asegúrate de que la propiedad 'nombre' esté presente
+              console.log('Usuario recuperado:', usuarioParseado);
+              setNom_Cli(usuarioParseado.Nom_Cli);
             }
           } catch (error) {
             console.error('Error al obtener el nombre del usuario:', error);
           }
         };
-      
-  
       obtenerNombre();
     }, []);
 
@@ -87,7 +85,7 @@ const IndexScreen = ({ navigation }) => {
 
                 {/* Lugares */}
                 <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
-                <List/>
+                <List navigation={navigation} />
 
                 
                 
