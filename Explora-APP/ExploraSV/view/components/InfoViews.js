@@ -10,10 +10,10 @@ export default function List({ navigation }) {
       name: 'Volcán de Izalco',
       location: 'Departamento de Sonsonate, El Salvador',
       descripcion: 'Volcán joven y popular para hacer senderismo.',
-      image: 'https://elsalvador.travel/wp-content/uploads/2021/01/Izalco.jpg',
+      image: '../../assets/fondo3.jpg',
       puntaje: 4.8,
       horario: '8:00 am - 4:00 pm',
-      precios: ['$1.00', '$3.00'],
+      precios: ['$1.00', '$5.00'],
       actividades: ['Senderismo', 'Camping'],
       recomendaciones: [
         { image: 'https://cdn-icons-png.flaticon.com/512/892/892458.png', caption: 'Ropa cómoda' },
