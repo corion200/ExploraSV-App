@@ -5,6 +5,23 @@ import tw from '../tw';
 
 const screenWidth = Dimensions.get('window').width;
 
+const transformarDatosSitio = (datosRaw) => {
+  return {
+    image: datosRaw.Img || null,
+    title: datosRaw.Nom_Siti || 'Título no disponible',
+    puntaje: datosRaw.Punt ?? null,
+    location: datosRaw.Activi_Siti || 'Ubicación no disponible',
+    descripcion: datosRaw.Recomendacione_Siti || 'Descripción no disponible',
+    horario:
+      datosRaw.HoraI_Siti && datosRaw.HoraF_Siti
+        ? `${datosRaw.HoraI_Siti.slice(0, 5)} - ${datosRaw.HoraF_Siti.slice(0, 5)}`
+        : 'Horario no disponible',
+    precios: [],        // Aquí podrías agregar precios si tienes info
+    actividades: [],    // Igual para actividades, con iconos y etiquetas si quieres
+    recomendaciones: [],// Y recomendaciones para el carrusel
+  };
+};
+
 const plantillaSitio = ({
   image,
   title,
@@ -16,6 +33,18 @@ const plantillaSitio = ({
   actividades = [],
   recomendaciones = [],
 }) => {
+  console.log('Props plantillaSitio:', {
+    image,
+    title,
+    puntaje,
+    location,
+    descripcion,
+    horario,
+    precios,
+    actividades,
+    recomendaciones,
+  });
+
   return (
     <ScrollView style={tw`flex-1`}>
       {/* Imagen principal */}
@@ -97,4 +126,5 @@ const plantillaSitio = ({
   );
 };
 
+export { plantillaSitio, transformarDatosSitio };
 export default plantillaSitio;
