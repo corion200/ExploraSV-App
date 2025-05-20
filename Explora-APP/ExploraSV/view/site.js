@@ -1,25 +1,25 @@
-// Site.js
 import React from 'react';
-import { useRoute } from '@react-navigation/native';
+import { View } from 'react-native';
 import PlantillaSitio from './components/plantillaSitio';
 
-const Site = () => {
-  const route = useRoute();
+export default function Site({ route }) {
   const { sitio } = route.params;
 
-  return (
-    <PlantillaSitio
-      image={sitio.image}
-      title={sitio.title}
-      puntaje={sitio.puntaje}
-      location={sitio.location}
-      descripcion={sitio.descripcion}
-      horario={sitio.horario}
-      precios={sitio.precios}
-      actividades={sitio.actividades}
-      recomendaciones={sitio.recomendaciones}
-    />
-  );
-};
+  const data = {
+    image: sitio.Img || null,
+    title: sitio.Nom_Siti || 'Título no disponible',
+    puntaje: sitio.puntaje || 'N/A',
+    location: sitio.location || 'Ubicación no disponible',
+    descripcion: sitio.descripcion || 'Sin descripción',
+    horario: sitio.horario || 'Horario no disponible',
+    precios: sitio.precios || [],
+    actividades: sitio.actividades || [],
+    recomendaciones: sitio.recomendaciones || [],
+  };
 
-export default Site;
+  return (
+    <View style={{ flex: 1 }}>
+      <PlantillaSitio {...data} />
+    </View>
+  );
+}
