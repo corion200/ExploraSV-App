@@ -21,7 +21,6 @@ export default function Navigation() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
       </Stack.Navigator>
-      
     </NavigationContainer>
   );
 }
