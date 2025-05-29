@@ -45,6 +45,7 @@ const IndexScreen = ({ navigation }) => {
     return (
        
             <SafeAreaView style={tw`flex-1  p-4`}>
+              <ScrollView comoponetStyle={tw`p-1 pb-28`}>
                 {/* Header */}
                 <View style={tw`mb-6 flex-row justify-between items-center`}>
                     <View>
@@ -90,12 +91,11 @@ const IndexScreen = ({ navigation }) => {
                 {/* Lugares */}
                 <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
                 <List navigation={navigation} />
-
-                
+              </ScrollView>
+              {/* Afuera del area del scroll para que se quede fijo*/}
                 <BottomNavBar 
                   onTabChange={handleTabChange}
                 />
-
             </SafeAreaView>
 
         
