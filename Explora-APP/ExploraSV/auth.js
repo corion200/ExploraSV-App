@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 
 
 export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {
+
+  await AsyncStorage.removeItem('Turista');
   try {
     const response = await api.post('/register', {
       Nom_Cli,

@@ -58,7 +58,7 @@ const SignUp = () => {
               <View style={tw`mb-5`}>
                 <View style={tw`flex-row items-center mb-2`}>
                   <Feather name="user" size={20} color="#4B5563" style={tw`mr-2`} />
-                  <Text style={tw`text-gray-700 font-medium`}>Nombre Completo</Text>
+                  <Text style={tw`text-gray-700 font-medium`}>Nombre y Apellido</Text>
                 </View>
                 <TextInput
                   placeholder="Nombre completo"

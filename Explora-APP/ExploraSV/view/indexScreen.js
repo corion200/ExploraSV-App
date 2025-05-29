@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, StatusBar } from 'react';
 import { View, Text, TouchableOpacity, ScrollView,Button } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
+import BottomNavBar from './components/nav';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,7 +13,10 @@ import { logout } from '../auth';
 const IndexScreen = ({ navigation }) => {
 
     const [Nom_Cli, setNom_Cli] = useState('');
-
+    const handleTabChange = (tabId) => {
+      console.log(`Pestaña seleccionada: ${tabId}`);
+      // Implementa aquí tu lógica de navegación
+    };
     useEffect(() => {
       const obtenerNombre = async () => {
         try {
@@ -39,8 +43,8 @@ const IndexScreen = ({ navigation }) => {
       };
   
     return (
-        <ScrollView style={tw`flex-1 bg-gray-50`}>
-            <SafeAreaView style={tw`p-4`}>
+       
+            <SafeAreaView style={tw`flex-1  p-4`}>
                 {/* Header */}
                 <View style={tw`mb-6 flex-row justify-between items-center`}>
                     <View>
@@ -54,12 +58,12 @@ const IndexScreen = ({ navigation }) => {
                 </View>
 
                 {/* Banner */}
-                <View style={tw`bg-blue-500 rounded-lg p-5 mb-6 shadow-md`}>
+                <View style={tw`bg-[#101C5D] rounded-lg p-5 mb-6 shadow-md`}>
                     <Text style={tw`text-lg font-bold text-white`}>Reserva Ahora</Text>
                     <Text style={tw`text-sm text-white my-2`}>
                         Recibe una recompensa al hacer tu reserva con nosotros
                     </Text>
-                    <TouchableOpacity style={tw`bg-yellow-400 px-4 py-2 rounded-full self-start flex-row items-center`}>
+                    <TouchableOpacity style={tw`bg-[#3FCFB0] px-4 py-2 rounded-full self-start flex-row items-center`}>
                         <Icon name="calendar-check" size={16} color="black" style={tw`mr-2`} />
                         <Text style={tw`text-sm font-bold text-black`}>Reservar</Text>
                     </TouchableOpacity>
@@ -88,9 +92,13 @@ const IndexScreen = ({ navigation }) => {
                 <List navigation={navigation} />
 
                 
-                
+                <BottomNavBar 
+                  onTabChange={handleTabChange}
+                />
+
             </SafeAreaView>
-        </ScrollView>
+
+        
     );
 };
 

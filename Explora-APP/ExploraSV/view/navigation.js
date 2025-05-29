@@ -14,19 +14,14 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="AuthLoading" component={AuthLoading} />
+        <Stack.Screen name="AuthLoading" component={AuthLoading} />
         <Stack.Screen name="Landing" component={Landing} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
       </Stack.Navigator>
-      <Stack.Screen name="Landing" component={Landing} />
-      <Stack.Screen name="SignUp" component={SignUp} />
-      <Stack.Screen name="Index" component={Index} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Site" component={Site} />
-</Stack.Navigator>
+      
     </NavigationContainer>
   );
 }
