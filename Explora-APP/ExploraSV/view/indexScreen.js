@@ -45,9 +45,7 @@ const IndexScreen = ({ navigation }) => {
     return (
        
             <SafeAreaView style={tw`flex-1  p-4`}>
-              <ScrollView style={tw`flex-1`}
-                contentContainerStyle={tw`pb-10`} // <- importante para permitir espacio al final
-                showsVerticalScrollIndicator={false}>
+              <ScrollView comoponetStyle={tw`p-1 pb-28`}>
                 {/* Header */}
                   <View style={tw`mb-6 flex-row justify-between items-center`}>
                       <View>
