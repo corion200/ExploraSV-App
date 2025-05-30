@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // todaví
 
 export default function List({ navigation }) {
   const [sitios, setSitios] = useState([]);
+  
+  
 
   useEffect(() => {
     api.get('/sitios')
@@ -15,24 +17,29 @@ export default function List({ navigation }) {
       .catch(err => console.error('Error al cargar sitios:', err));
   }, []);
 
+
   return (
     <View style={tw`mb-6`}>
       {sitios.map((place, index) => (
+        
         <TouchableOpacity
           key={index}
           onPress={() => navigation.navigate('Site', { sitio: place })}
           style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}
         >
           <View style={tw`w-16 h-16 bg-gray-200 rounded-lg mr-3 items-center justify-center overflow-hidden`}>
-            {place.Img ? (
-              <Image
-                source={{ uri: place.Img }}
-                style={tw`w-full h-full`}
-                resizeMode="cover"
-              />
-            ) : (
-              <Icon name="image-off-outline" size={32} color="#9CA3AF" />
-            )}
+          {place.imagen_url ? (
+            
+            <Image
+              source={{ uri: place.imagen_url }}         
+              style={tw`w-full h-full`}
+              resizeMode="cover"
+              
+            />
+          ) : (
+            <Icon name="image-off-outline" size={32} color="#9CA3AF" />
+            
+          )}
           </View>
           <View style={tw`flex-1`}>
             <Text style={tw`text-sm font-bold text-gray-800`}>

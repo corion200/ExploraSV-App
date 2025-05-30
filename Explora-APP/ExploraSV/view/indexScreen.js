@@ -45,57 +45,64 @@ const IndexScreen = ({ navigation }) => {
     return (
        
             <SafeAreaView style={tw`flex-1  p-4`}>
+              <ScrollView style={tw`flex-1`}
+                contentContainerStyle={tw`pb-10`} // <- importante para permitir espacio al final
+                showsVerticalScrollIndicator={false}>
                 {/* Header */}
-                <View style={tw`mb-6 flex-row justify-between items-center`}>
-                    <View>
-                        <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Turista'}!</Text>
-                        <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
-                    </View>
-                    <View style={tw`items-center`}>
-                        <Icon name="account-circle" size={40} color="#6B7280" />
-                        <Button title="Cerrar sesión" color="red" onPress={cerrarSesion} />
-                    </View>
-                </View>
+                  <View style={tw`mb-6 flex-row justify-between items-center`}>
+                      <View>
+                          <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Turista'}!</Text>
+                          <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
+                      </View>
+                      <View style={tw`items-center`}>
+                          <Icon name="account-circle" size={40} color="#6B7280" />
+                          <Button title="Cerrar sesión" color="red" onPress={cerrarSesion} />
+                      </View>
+                  </View>
 
-                {/* Banner */}
-                <View style={tw`bg-[#101C5D] rounded-lg p-5 mb-6 shadow-md`}>
-                    <Text style={tw`text-lg font-bold text-white`}>Reserva Ahora</Text>
-                    <Text style={tw`text-sm text-white my-2`}>
-                        Recibe una recompensa al hacer tu reserva con nosotros
-                    </Text>
-                    <TouchableOpacity style={tw`bg-[#3FCFB0] px-4 py-2 rounded-full self-start flex-row items-center`}>
-                        <Icon name="calendar-check" size={16} color="black" style={tw`mr-2`} />
-                        <Text style={tw`text-sm font-bold text-black`}>Reservar</Text>
-                    </TouchableOpacity>
-                </View>
+                  {/* Banner */}
+                  <View style={tw`bg-[#101C5D] rounded-lg p-5 mb-6 shadow-md`}>
+                      <Text style={tw`text-lg font-bold text-white`}>Reserva Ahora</Text>
+                      <Text style={tw`text-sm text-white my-2`}>
+                          Recibe una recompensa al hacer tu reserva con nosotros
+                      </Text>
+                      <TouchableOpacity style={tw`bg-[#3FCFB0] px-4 py-2 rounded-full self-start flex-row items-center`}>
+                          <Icon name="calendar-check" size={16} color="black" style={tw`mr-2`} />
+                          <Text style={tw`text-sm font-bold text-black`}>Reservar</Text>
+                      </TouchableOpacity>
+                  </View>
 
-                {/* Categorías */}
-                <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Explora por categorías:</Text>
-                <View style={tw`flex-row justify-between mb-6`}>
-                    {[
-                        { name: 'Senderismo', icon: 'hiking' },
-                        { name: 'Playas', icon: 'beach' },
-                        { name: 'Eco Turismo', icon: 'leaf' },
-                        { name: 'Aventura', icon: 'compass' }
-                    ].map((category, index) => (
-                        <TouchableOpacity key={index} style={tw`items-center`}>
-                            <View style={tw`w-14 h-14 bg-gray-200 rounded-full mb-2 items-center justify-center shadow-sm`}>
-                                <Icon name={category.icon} size={28} color="#4B5563" />
-                            </View>
-                            <Text style={tw`text-xs text-center text-gray-700`}>{category.name}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                  {/* Categorías */}
+                  <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Explora por categorías:</Text>
+                  <View style={tw`flex-row justify-between mb-6`}>
+                      {[
+                          { name: 'Senderismo', icon: 'hiking' },
+                          { name: 'Playas', icon: 'beach' },
+                          { name: 'Eco Turismo', icon: 'leaf' },
+                          { name: 'Aventura', icon: 'compass' }
+                      ].map((category, index) => (
+                          <TouchableOpacity key={index} style={tw`items-center`}>
+                              <View style={tw`w-14 h-14 bg-gray-200 rounded-full mb-2 items-center justify-center shadow-sm`}>
+                                  <Icon name={category.icon} size={28} color="#4B5563" />
+                              </View>
+                              <Text style={tw`text-xs text-center text-gray-700`}>{category.name}</Text>
+                          </TouchableOpacity>
+                      ))}
+                  </View>
 
-                {/* Lugares */}
-                <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
-                <List navigation={navigation} />
+                  {/* Lugares */}
+                  
+                  <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
+                  <List navigation={navigation} />
+                  
 
+                  
                 
-                <BottomNavBar 
-                  onTabChange={handleTabChange}
-                />
-
+              </ScrollView>
+                  <BottomNavBar 
+                    onTabChange={handleTabChange}
+                  />
+              
             </SafeAreaView>
 
         
@@ -103,3 +110,4 @@ const IndexScreen = ({ navigation }) => {
 };
 
 export default IndexScreen;
+

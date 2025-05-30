@@ -4,6 +4,8 @@ import { View, Text, TextInput, TouchableOpacity, Image, StatusBar, KeyboardAvoi
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { login, getCurrentUser } from '../auth'; 
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 
 const SignIn = () => {
@@ -35,10 +37,11 @@ const SignIn = () => {
 
  
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={tw`flex-1`}
-    >
+    <KeyboardAwareScrollView
+contentContainerStyle={tw`flex-grow justify-end bg-black`}
+enableOnAndroid={true}
+    keyboardShouldPersistTaps="handled"
+  >
       <StatusBar barStyle="light-content" />
       <View style={tw`flex-1 bg-black`}>
         <View style={tw`flex-1 justify-center items-center bg-black/30`}>
@@ -110,8 +113,7 @@ const SignIn = () => {
           </ScrollView>
         </View>
       </View>
-    </KeyboardAvoidingView>
-  );
+      </KeyboardAwareScrollView>  );
 };
 
 export default SignIn;

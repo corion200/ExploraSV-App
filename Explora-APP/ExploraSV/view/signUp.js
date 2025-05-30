@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import tw from './tw'; 
-import { View, Text, TextInput, TouchableOpacity, Image, StatusBar, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StatusBar, ScrollView,  SafeAreaView } from 'react-native';
 import { Feather, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
 import { register } from '../auth'; 
 import { Alert } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 
 const SignUp = () => {
@@ -35,9 +37,12 @@ const SignUp = () => {
  
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={tw`flex-1`}
+    
+  <SafeAreaView style={tw`flex-1 bg-black`}>
+    <KeyboardAwareScrollView
+    contentContainerStyle={tw`flex-grow justify-end bg-black`}
+    enableOnAndroid={true}
+    keyboardShouldPersistTaps="handled"
     >
       <StatusBar barStyle="light-content" />
       <View style={tw`flex-1 bg-black`}>
@@ -148,7 +153,8 @@ const SignUp = () => {
           </ScrollView>
         </View>
       </View>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+      </SafeAreaView>
   );
 };
 
