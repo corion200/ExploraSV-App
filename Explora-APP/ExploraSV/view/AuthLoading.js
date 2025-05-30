@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const AuthLoading = ({ navigation }) => {
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const Pcarga = await AsyncStorage.getItem('token');
+      const Pcarga = await AsyncStorage.getItem('Turista');
       if (Pcarga === 'true') {
         navigation.replace('Index'); // Pantalla principal
       } else {

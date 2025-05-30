@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { View, Text, FlatList, ImageBackground, TouchableOpacity, Dimensions,  SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import tw from './tw';
+import { StatusBar } from 'react-native';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -55,6 +57,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={tw`flex-1`}>
+    <StatusBar barStyle="light-content" backgroundColor="#101C5D" />
+
       <FlatList
         ref={flatListRef}
         data={slides}

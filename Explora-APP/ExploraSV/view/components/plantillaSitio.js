@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Image, ScrollView, FlatList, Dimensions, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import  {MaterialIcons } from '@expo/vector-icons/MaterialIcons';
 import tw from '../tw';
 
 const screenWidth = Dimensions.get('window').width;
@@ -21,7 +20,7 @@ const transformarDatosSitio = (datosRaw) => {
         : 'Horario no disponible',
     precios: [],        // Aquí podrías agregar precios si tienes info
     actividades: [],    // Igual para actividades, con iconos y etiquetas si quieres
-    recomendaciones: datosRaw.Recomendacione_Siti,// Y recomendaciones para el carrusel
+    recomendaciones: datosRaw.Recomendacione_Siti,
   };
 };
 
@@ -49,18 +48,18 @@ const plantillaSitio = ({
   });
 
   return (
-    <SafeAreaView style={tw`flex-1 pt-13 `}>
+    <SafeAreaView style={tw`flex-1 bg-white`}>
       <ScrollView style={tw`flex-1`}>
         {/* Imagen principal */}
       
         <Image
           source={{ uri: image || 'https://via.placeholder.com/400x250?text=Imagen+no+disponible' }}
-          style={{ width: ' 100%', height: 250    }}
+          style={{ width: ' 100%', height: 310    }}
           resizeMode="cover"
         />
 
         {/* Contenido */}
-        <View style={tw`bg-white rounded-t-3xl -mt-5 p-4`}>
+        <View style={tw`bg-white rounded-[25px] -mt-5 p-4`}>
           <Text style={tw`text-xl font-bold`}>
             {title?.trim() || 'Título no disponible'} <Ionicons name="leaf-outline" size={18} color="green" />
           </Text>
@@ -91,12 +90,12 @@ const plantillaSitio = ({
           </View>
 
           {/* Actividades */}
-          <Text style={tw`font-bold text-base mt-4`}>¡Atrévete a probar estas actividades!</Text>
-          <View style={tw`flex-row flex-wrap mt-3`}>
+          <Text style={tw`font-bold text-base mt-4 `}>Atrévete a probar estas actividades:</Text>
+          <View style={tw`flex-row flex-wrap mt-3 `}>
             {actividades.length > 0 ? (
               actividades.map((act, i) => (
-                <View key={i} style={tw`items-center w-20 mb-4`}>
-                  <Ionicons name={act.icon || 'help-circle-outline'} size={24} />
+                <View key={i} style={tw`items-center w-20 `}>
+                  <Ionicons name={'ribbon-outline'} size={24} />
                   <Text style={tw`text-center mt-1 text-sm`}>{act.label || 'Actividad desconocida'}</Text>
                 </View>
               ))
@@ -105,18 +104,16 @@ const plantillaSitio = ({
             )}
           </View>
   
-         <Text style={tw`font-bold text-base mt-4`}>¡Vive una mejor experiencia!</Text>
+         <Text style={tw`font-bold text-base mt-4 text-center`}>¡Vive una mejor experiencia, con estas recomendaciones!</Text>
           {recomendaciones.length > 0 ? (
             <FlatList
               horizontal
               data={recomendaciones}
               renderItem={({ item  }) => (
-                <View style={[tw`items-center mr-3`, { width: screenWidth * 0.6 }]}>
+                <View style={[tw`items-center mr-3 mb-20`, { width: screenWidth * 0.3 }]}>
                   <Image
-                    source={{  uri: image || 'https://cdn-icons-png.flaticon.com/512/3524/3524649.png',
-
- }}
-                    style={tw`w-full h-24 rounded-lg`}
+                   source={require('../../assets/reco.png')} 
+                    style={tw`w-full h-20 rounded-lg`}
                   />
                   <Text style={tw`mt-2 text-center text-sm`}>{item.caption || 'Sin descripción'}</Text>
                 </View>
@@ -130,7 +127,7 @@ const plantillaSitio = ({
           )}
         </View>
       </ScrollView>
-      </SafeAreaView>
+    </SafeAreaView>
   );
 };
 

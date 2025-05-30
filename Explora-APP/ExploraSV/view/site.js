@@ -1,5 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import tw from './tw'; 
+import { View, ScrollView, SafeAreaView } from 'react-native';
+import BottomNavBar from './components/nav';
 import PlantillaSitio from './components/plantillaSitio';
 
 export default function Site({ route }) {
@@ -25,6 +27,8 @@ export default function Site({ route }) {
     }))
   : [];
 
+ 
+
     const data = {
     image: sitio.imagen_url || null,
     title: sitio.Nom_Siti || 'Título no disponible',
@@ -39,11 +43,21 @@ export default function Site({ route }) {
     actividades,
     recomendaciones
   };
+  
 
   return (
-    <View style={{ flex: 1 }}>
-      <PlantillaSitio {...data} />
-    </View>
+    <SafeAreaView style={tw`flex-1 pt-12`}>
+      <View style={{ flex: 1 }}>
+        <ScrollView  showsVerticalScrollIndicator={false}  >
+          <PlantillaSitio {...data} />
+        </ScrollView>
+        <BottomNavBar 
+        />
+      </View>
+    </SafeAreaView>
+    
+    
+    
   );
 }
 

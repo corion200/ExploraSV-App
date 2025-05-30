@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 import tw from 'twrnc';
 
@@ -15,27 +16,29 @@ import tw from 'twrnc';
  * @returns {React.Component} Componente de barra de navegación
  */
 const BottomNavBar = ({
-  initialTab = 'Inicio',
+  initialTab = 'Index',
   onTabChange,
   activeColor = '#3FCFB0',
   inactiveColor = '#6b7280',
   iconSize = 26
 }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+  const navigation = useNavigation();
 
   const menuItems = [
-    { id: 'Inicio', icon: 'home', label: 'Inicio' },
+    { id: 'Index', icon: 'home', label: 'Inicio' },
     { id: 'Buscar', icon: 'search', label: 'Buscar' },
     { id: 'Asistente', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
     { id: 'reservas', icon: 'receipt-outline', label: 'Reservas' },
     { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
 
   ];
-
   const handleTabPress = (tabId) => {
     setActiveTab(tabId);
     if (onTabChange) {
       onTabChange(tabId);
+    } else {
+      navigation.navigate(tabId); // 🔁 usa esto si quieres navegar automáticamente
     }
   };
 

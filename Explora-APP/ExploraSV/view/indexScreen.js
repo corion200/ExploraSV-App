@@ -1,5 +1,5 @@
-import React, { useState, useEffect, StatusBar } from 'react';
-import { View, Text, TouchableOpacity, ScrollView,Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView,Button, StatusBar } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
 import BottomNavBar from './components/nav';
@@ -13,10 +13,7 @@ import { logout } from '../auth';
 const IndexScreen = ({ navigation }) => {
 
     const [Nom_Cli, setNom_Cli] = useState('');
-    const handleTabChange = (tabId) => {
-      console.log(`Pestaña seleccionada: ${tabId}`);
-      // Implementa aquí tu lógica de navegación
-    };
+    
     useEffect(() => {
       const obtenerNombre = async () => {
         try {
@@ -45,7 +42,8 @@ const IndexScreen = ({ navigation }) => {
     return (
        
             <SafeAreaView style={tw`flex-1  p-4`}>
-              <ScrollView comoponetStyle={tw`p-1 pb-28`}>
+              <StatusBar barStyle="dark-content" backgroundColor="#101C5D" />
+              <ScrollView  showsVerticalScrollIndicator={false}  comoponetStyle={tw` ` }>
                 {/* Header */}
                   <View style={tw`mb-6 flex-row justify-between items-center`}>
                       <View>
@@ -53,7 +51,6 @@ const IndexScreen = ({ navigation }) => {
                           <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
                       </View>
                       <View style={tw`items-center`}>
-                          <Icon name="account-circle" size={40} color="#6B7280" />
                           <Button title="Cerrar sesión" color="red" onPress={cerrarSesion} />
                       </View>
                   </View>
@@ -91,14 +88,13 @@ const IndexScreen = ({ navigation }) => {
                   {/* Lugares */}
                   
                   <Text style={tw`text-base font-bold text-gray-800 mb-4`}>Lugares que no te puedes perder:</Text>
-                  <List navigation={navigation} />
+                  <List  navigation={navigation} />
                   
 
                   
                 
               </ScrollView>
                   <BottomNavBar 
-                    onTabChange={handleTabChange}
                   />
               
             </SafeAreaView>

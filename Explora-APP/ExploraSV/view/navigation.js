@@ -6,6 +6,7 @@ import SignUp from './signUp';
 import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
+import Perfil from './perfil';
 import AuthLoading from './AuthLoading';
 
 const Stack = createStackNavigator();
@@ -20,6 +21,7 @@ export default function Navigation() {
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
+        <Stack.Screen name="Perfil" component={Perfil} />
       </Stack.Navigator>
     </NavigationContainer>
   );
