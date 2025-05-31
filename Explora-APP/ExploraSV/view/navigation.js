@@ -8,6 +8,7 @@ import Login from './login';
 import Site from './site';
 import Perfil from './perfil';
 import AuthLoading from './AuthLoading';
+import Reservacion from './reservacion';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export default function Navigation() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
         <Stack.Screen name="Perfil" component={Perfil} />
+        <Stack.Screen name="Reservacion" component={Reservacion} />
       </Stack.Navigator>
     </NavigationContainer>
   );

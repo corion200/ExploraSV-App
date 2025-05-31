@@ -29,7 +29,7 @@ const BottomNavBar = ({
     { id: 'Index', icon: 'home', label: 'Inicio' },
     { id: 'Buscar', icon: 'search', label: 'Buscar' },
     { id: 'Asistente', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
-    { id: 'reservas', icon: 'receipt-outline', label: 'Reservas' },
+    { id: 'Reservacion', icon: 'receipt-outline', label: 'Reservas' },
     { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
 
   ];
