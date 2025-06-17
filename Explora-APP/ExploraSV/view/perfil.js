@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView,StatusBar  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from './tw';
+import BottomNavBar from './components/nav';
+
 
 
 const ConfiguracionesScreen = () => {
@@ -84,6 +86,8 @@ const ConfiguracionesScreen = () => {
           ))}
         </View>
       </ScrollView>
+      <BottomNavBar 
+                  />
     </SafeAreaView>
   );
 };

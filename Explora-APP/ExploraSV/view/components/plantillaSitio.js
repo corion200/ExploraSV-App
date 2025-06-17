@@ -1,14 +1,22 @@
-import React from 'react';
-import { View, Text, Image, ScrollView, FlatList, Dimensions, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ScrollView, FlatList, Dimensions, SafeAreaView,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Comentario from "./reviewSitio";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
+
+
 import tw from '../tw';
 
 const screenWidth = Dimensions.get('window').width;
 
 
+
+
 const transformarDatosSitio = (datosRaw) => {
   return {
-    
+    Id_Siti : datosRaw.Id_Siti   || null, 
     image: datosRaw.imagen_url || null, 
     title: datosRaw.Nom_Siti || 'Título no disponible',
     puntaje: datosRaw.Punt ?? null,
@@ -25,6 +33,7 @@ const transformarDatosSitio = (datosRaw) => {
 };
 
 const plantillaSitio = ({
+  Id_Siti,
   image,
   title,
   puntaje,
@@ -34,8 +43,13 @@ const plantillaSitio = ({
   precios = [],
   actividades = [],
   recomendaciones = [],
-}) => {
+}
+) => {
+  
+ 
   console.log('Props plantillaSitio:', {
+    
+    Id_Siti,
     image,
     title,
     puntaje,
@@ -46,9 +60,17 @@ const plantillaSitio = ({
     actividades,
     recomendaciones,
   });
+  
+
+    
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`}>
+    <KeyboardAwareScrollView
+    contentContainerStyle={tw` justify-end `}
+    enableOnAndroid={true}
+    keyboardShouldPersistTaps="handled"
+    >
       <ScrollView style={tw`flex-1`}>
         {/* Imagen principal */}
       
@@ -104,13 +126,13 @@ const plantillaSitio = ({
             )}
           </View>
   
-         <Text style={tw`font-bold text-base mt-4 text-center`}>¡Vive una mejor experiencia, con estas recomendaciones!</Text>
+         <Text style={tw`font-bold text-base mt-4 text-center mb-4`}>¡Vive una mejor experiencia, con estas recomendaciones!</Text>
           {recomendaciones.length > 0 ? (
             <FlatList
               horizontal
               data={recomendaciones}
               renderItem={({ item  }) => (
-                <View style={[tw`items-center mr-3 mb-20`, { width: screenWidth * 0.3 }]}>
+                <View style={[tw`items-center mr-3 `, { width: screenWidth * 0.3 }]}>
                   <Image
                    source={require('../../assets/reco.png')} 
                     style={tw`w-full h-20 rounded-lg`}
@@ -126,7 +148,14 @@ const plantillaSitio = ({
             <Text style={tw`text-gray-500`}>No hay recomendaciones por el momento</Text>
           )}
         </View>
+        <Comentario Id_Siti={Id_Siti } />
+        
+        
+      
+
+
       </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

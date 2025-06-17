@@ -7,6 +7,7 @@ import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
 import Perfil from './perfil';
+import Search from './search';
 import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 
@@ -22,7 +23,9 @@ export default function Navigation() {
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
+        <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Perfil" component={Perfil} />
+
         <Stack.Screen name="Reservacion" component={Reservacion} />
       </Stack.Navigator>
     </NavigationContainer>

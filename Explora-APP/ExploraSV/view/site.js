@@ -30,6 +30,7 @@ export default function Site({ route }) {
  
 
     const data = {
+    Id_Siti: sitio.Id_Siti || null,
     image: sitio.imagen_url || null,
     title: sitio.Nom_Siti || 'Título no disponible',
     puntaje: sitio.Punt || 'N/A',

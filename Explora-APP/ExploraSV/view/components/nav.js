@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useNavigationState  } from '@react-navigation/native';
+import { useEffect } from 'react';
+
 
 import tw from 'twrnc';
 
@@ -27,7 +29,7 @@ const BottomNavBar = ({
 
   const menuItems = [
     { id: 'Index', icon: 'home', label: 'Inicio' },
-    { id: 'Buscar', icon: 'search', label: 'Buscar' },
+    { id: 'Search', icon: 'search', label: 'Search' },
     { id: 'Asistente', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
     { id: 'Reservacion', icon: 'receipt-outline', label: 'Reservas' },
     { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
@@ -41,7 +43,10 @@ const BottomNavBar = ({
       navigation.navigate(tabId); // 🔁 usa esto si quieres navegar automáticamente
     }
   };
-
+  const currentRoute = useNavigationState((state) => {
+    const route = state.routes[state.index];
+    return route.name;
+  });
   return (
     <View style={[
       tw` bg-white border-t border-gray-200 flex-row justify-between items-center h-25 px-2`,

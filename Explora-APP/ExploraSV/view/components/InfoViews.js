@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native'; // <-- aquí el Image
 import tw from '../tw';
-import axios from 'axios';
 import api from '../../api';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // todavía no lo usas
 
 export default function List({ navigation }) {
   const [sitios, setSitios] = useState([]);
-  
+
   
 
   useEffect(() => {
@@ -23,10 +22,15 @@ export default function List({ navigation }) {
       {sitios.map((place, index) => (
         
         <TouchableOpacity
-          key={index}
-          onPress={() => navigation.navigate('Site', { sitio: place })}
-          style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}
-        >
+        key={index}
+        onPress={() => navigation.navigate('Site', {
+          sitio: {
+            ...place,
+            Id_Siti : place.Id_Siti ,   // Asegúrate que este campo existe en los datos
+          }
+        })}
+        style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}
+      >
           <View style={tw`w-16 h-16 bg-gray-200 rounded-lg mr-3 items-center justify-center overflow-hidden`}>
           {place.imagen_url ? (
             
