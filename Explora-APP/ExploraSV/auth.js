@@ -93,3 +93,15 @@ export async function login(Correo_Cli, Contra_Cli,navigation ) {
       console.error('Error al cerrar sesión:', error.message);
     }
   }
+
+  // Editar perfil
+  export async function updateProfile(userData) {
+    try {
+      const res = await api.put('/perfil', userData);
+      console.log('Perfil actualizado correctamente');
+      return res.data.user;  
+    } catch (error) {
+      console.error('Error al actualizar perfil:', error.response?.data || error.message);
+      throw error;
+    }
+  }

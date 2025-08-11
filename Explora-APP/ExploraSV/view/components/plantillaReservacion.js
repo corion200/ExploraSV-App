@@ -4,6 +4,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView, Alert,SafeAreaView } f
 import { Ionicons } from "@expo/vector-icons";
 import BottomNavBar from '../components/nav';
 import tw from '../tw';
+import { useNavigation,useNavigationState  } from '@react-navigation/native';
 
 
 export default function PantallaReservacion({ navigation }) {
@@ -12,6 +13,7 @@ export default function PantallaReservacion({ navigation }) {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [tipoHabitacion, setTipoHabitacion] = useState("doble");
+  const naviga = useNavigation();
   
   // Precios base por tipo de habitación
   const preciosHabitacion = {
@@ -224,10 +226,10 @@ export default function PantallaReservacion({ navigation }) {
 
         {/* Botón */}
         <TouchableOpacity 
-          style={tw`bg-blue-600 py-4 rounded-xl mb-8 shadow-lg`}
-          onPress={procesarReserva}
+          style={tw`bg-black rounded-lg py-3 px-6 items-center mb-40`}
+         onPress={() => naviga.navigate('Payment')}
         >
-          <Text style={tw`text-white text-center text-lg font-bold`}>
+          <Text style={tw`text-white text-center text-ms font-bold`}>
             Reservar
           </Text>
         </TouchableOpacity>

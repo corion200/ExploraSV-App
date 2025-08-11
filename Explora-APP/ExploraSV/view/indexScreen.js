@@ -1,60 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Button, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
+import { useIsFocused } from '@react-navigation/native';
 import BottomNavBar from './components/nav';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { logout } from '../auth';
+
 
 const IndexScreen = ({ navigation }) => {
     const [Nom_Cli, setNom_Cli] = useState('');
-    
+    const isFocused = useIsFocused();
     useEffect(() => {
-      const obtenerNombre = async () => {
-        try {
+      if (isFocused) {
+        const obtenerNombre = async () => {
+          try {
             const usuario = await AsyncStorage.getItem('Turista');
             if (usuario) {
               const usuarioParseado = JSON.parse(usuario);
-              console.log('Usuario recuperado:', usuarioParseado);
               setNom_Cli(usuarioParseado.Nom_Cli);
             }
           } catch (error) {
             console.error('Error al obtener el nombre del usuario:', error);
           }
         };
-      obtenerNombre();
-    }, []);
+        obtenerNombre();
+      }
+    }, [isFocused]);
 
-    const cerrarSesion = async () => {
-        try {
-          await logout(navigation);
-        } catch (error) {
-          console.error('Error al cerrar sesión:', error.message);
-        }
-      };
   
     return (
         <SafeAreaView style={tw`flex-1 p-4 bg-white`}>
-          <StatusBar barStyle="dark-content" backgroundColor="#101C5D" />
+          <StatusBar  />
           <ScrollView 
             showsVerticalScrollIndicator={false} 
-            contentContainerStyle={tw`pb-20`} // padding bottom para que no tape BottomNavBar
+            contentContainerStyle={tw`pb-20`} 
           >
             {/* Header */}
             <View style={tw`mb-6 flex-row justify-between items-center`}>
-                <View>
-                    <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Turista'}!</Text>
-                    <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
-                </View>
-                <View style={tw`items-center`}>
-                    <Button title="Cerrar sesión" color="red" onPress={cerrarSesion} />
-                </View>
+              <View>
+                <Text style={tw`text-xl font-bold text-gray-800`}> Hola, {Nom_Cli ? Nom_Cli : 'Turista'}!</Text>
+                <Text style={tw`text-sm text-gray-600`}>¿Qué aventura nos espera hoy?</Text>
+              </View>
+              
+              <Image
+                 source={require('../assets/Favicon25.png')} // o usa require si es local
+                style={{ width: 70, height: 70, borderRadius: 25 }} // círculo de 50x50
+              />
             </View>
 
             {/* Banner */}
-            <View style={tw`bg-[#101C5D] rounded-lg p-5 mb-6 shadow-md`}>
+            <View style={tw`bg-[#101C5D] rounded-lg p-4 mb-6 shadow-md`}>
                 <Text style={tw`text-lg font-bold text-white`}>Reserva Ahora</Text>
                 <Text style={tw`text-sm text-white my-2`}>
                     Recibe una recompensa al hacer tu reserva con nosotros
@@ -76,7 +73,7 @@ const IndexScreen = ({ navigation }) => {
             <View style={tw`flex-row justify-between mb-6`}>
                 {[
                     { name: 'Senderismo', icon: 'hiking' },
-                    { name: 'Playas', icon: 'beach' },
+                    { name: 'Playas', icon: 'umbrella-beach' },
                     { name: 'Eco Turismo', icon: 'leaf' },
                     { name: 'Aventura', icon: 'compass' }
                 ].map((category, index) => (

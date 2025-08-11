@@ -143,7 +143,7 @@ const SignUp = () => {
 
               
               {/* Login Link */}
-              <View style={tw`flex-row justify-center mt-6`}>
+              <View style={tw`flex-row justify-center mt-6 mb-10`}>
                 <Text style={tw`text-gray-600`}>¿Ya tienes una cuenta? </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                   <Text style={tw`text-blue-800 font-semibold`}>Iniciar Sesión</Text>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation,useNavigationState  } from '@react-navigation/native';
-import { useEffect } from 'react';
+
 
 
 import tw from 'twrnc';
@@ -40,7 +40,7 @@ const BottomNavBar = ({
     if (onTabChange) {
       onTabChange(tabId);
     } else {
-      navigation.navigate(tabId); // 🔁 usa esto si quieres navegar automáticamente
+      navigation.navigate(tabId); 
     }
   };
   const currentRoute = useNavigationState((state) => {
@@ -49,16 +49,16 @@ const BottomNavBar = ({
   });
   return (
     <View style={[
-      tw` bg-white border-t border-gray-200 flex-row justify-between items-center h-25 px-2`,
+      tw` bg-white border-t border-gray-200 flex-row justify-between items-center h-28 px-2`,
       styles.container
     ]}>
       {menuItems.map((item) => {
-        const isActive = activeTab === item.id;
+        const isActive = currentRoute === item.id;
         
         return (
           <TouchableOpacity
             key={item.id}
-            style={tw`flex-1 justify-center items-center py-1`}
+            style={tw`flex-1 justify-center items-center pb-5`}
             onPress={() => handleTabPress(item.id)}
           >
             <Icon 
@@ -78,7 +78,6 @@ const BottomNavBar = ({
   );
 };
 
-// Estilos adicionales para asegurar posicionamiento en la parte inferior
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',

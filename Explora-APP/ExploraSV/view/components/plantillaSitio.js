@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, FlatList, Dimensions, SafeAreaView,
+import { View, Text, Image, FlatList, Dimensions, ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Comentario from "./reviewSitio";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 
 import tw from '../tw';
 
 const screenWidth = Dimensions.get('window').width;
-
-
-
 
 const transformarDatosSitio = (datosRaw) => {
   return {
@@ -26,8 +22,8 @@ const transformarDatosSitio = (datosRaw) => {
       datosRaw.HoraI_Siti && datosRaw.HoraF_Siti
         ? `${datosRaw.HoraI_Siti.slice(0, 5)} - ${datosRaw.HoraF_Siti.slice(0, 5)}`
         : 'Horario no disponible',
-    precios: [],        // Aquí podrías agregar precios si tienes info
-    actividades: [],    // Igual para actividades, con iconos y etiquetas si quieres
+    precios: [],       
+    actividades: [],   
     recomendaciones: datosRaw.Recomendacione_Siti,
   };
 };
@@ -60,28 +56,26 @@ const plantillaSitio = ({
     actividades,
     recomendaciones,
   });
-  
-
-    
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-white`}>
-    <KeyboardAwareScrollView
-    contentContainerStyle={tw` justify-end `}
-    enableOnAndroid={true}
-    keyboardShouldPersistTaps="handled"
+    
+   
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    {/* Barra de estado transparente */}
+   
+
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 20 }}
     >
-      <ScrollView style={tw`flex-1`}>
-        {/* Imagen principal */}
-      
         <Image
           source={{ uri: image || 'https://via.placeholder.com/400x250?text=Imagen+no+disponible' }}
-          style={{ width: ' 100%', height: 310    }}
+          style={{ width: '100%', height: 310 }}
           resizeMode="cover"
         />
 
         {/* Contenido */}
-        <View style={tw`bg-white rounded-[25px] -mt-5 p-4`}>
+        <View style={tw`bg-white rounded-t-[25px] -mt-5 p-4`}>
           <Text style={tw`text-xl font-bold`}>
             {title?.trim() || 'Título no disponible'} <Ionicons name="leaf-outline" size={18} color="green" />
           </Text>
@@ -149,14 +143,10 @@ const plantillaSitio = ({
           )}
         </View>
         <Comentario Id_Siti={Id_Siti } />
-        
-        
-      
 
-
-      </ScrollView>
-      </KeyboardAwareScrollView>
-    </SafeAreaView>
+        </ScrollView>
+        </View>
+    
   );
 };
 

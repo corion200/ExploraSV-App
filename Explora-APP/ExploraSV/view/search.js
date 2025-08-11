@@ -19,7 +19,7 @@ const SearchApp = (navigation) => {
 
   return (
     <SafeAreaView style={tw`flex-1 pt-13`}>
-      <StatusBar barStyle="dark-content" backgroundColor="#101C5D" />
+      <StatusBar  />
       
       <ScrollView 
         showsVerticalScrollIndicator={false}

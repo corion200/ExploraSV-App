@@ -26,7 +26,7 @@ export default function List({ navigation }) {
         onPress={() => navigation.navigate('Site', {
           sitio: {
             ...place,
-            Id_Siti : place.Id_Siti ,   // Asegúrate que este campo existe en los datos
+            Id_Siti : place.Id_Siti ,  
           }
         })}
         style={tw`flex-row items-center mb-4 bg-white rounded-lg p-3 shadow-sm`}
@@ -51,7 +51,7 @@ export default function List({ navigation }) {
             </Text>
             <View style={tw`flex-row items-center`}>
               <Icon name="map-marker" size={12} color="#6B7280" style={tw`mr-1`} />
-              <Text style={tw`text-xs text-gray-600`}>Ver ubicación</Text>
+              <Text style={tw`text-xs text-gray-600`}>View location</Text>
             </View>
           </View>
           <Icon name="chevron-right" size={24} color="#6B7280" />
