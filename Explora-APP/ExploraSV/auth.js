@@ -1,7 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './api';
-import { useNavigation } from '@react-navigation/native';
-
 
 
 export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {

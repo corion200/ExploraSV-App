@@ -106,7 +106,7 @@ enableOnAndroid={true}
               <View style={tw`flex-row justify-center mt-6`}>
                 <Text style={tw`text-gray-600`}>¿No tienes una cuenta? </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('SignUp')} >
-                  <Text style={tw`text-blue-800 font-semibold`}>Registrate</Text>
+                  <Text style={tw`text-blue-800 font-semibold mb-3`}>Registrate</Text>
                 </TouchableOpacity>
               </View>
             </View>

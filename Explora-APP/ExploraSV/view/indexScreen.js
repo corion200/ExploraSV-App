@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native';
 import tw from './tw'; 
 import List from "./components/InfoViews";
-import { useIsFocused } from '@react-navigation/native';
 import BottomNavBar from './components/nav';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
@@ -10,24 +9,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const IndexScreen = ({ navigation }) => {
-    const [Nom_Cli, setNom_Cli] = useState('');
-    const isFocused = useIsFocused();
-    useEffect(() => {
-      if (isFocused) {
-        const obtenerNombre = async () => {
-          try {
-            const usuario = await AsyncStorage.getItem('Turista');
-            if (usuario) {
-              const usuarioParseado = JSON.parse(usuario);
-              setNom_Cli(usuarioParseado.Nom_Cli);
-            }
-          } catch (error) {
-            console.error('Error al obtener el nombre del usuario:', error);
-          }
-        };
-        obtenerNombre();
+  const [Nom_Cli, setNom_Cli] = useState('');
+
+useEffect(() => {
+  const obtenerNombre = async () => {
+    try {
+      const usuario = await AsyncStorage.getItem('Turista');
+      if (usuario) {
+        const usuarioParseado = JSON.parse(usuario);
+        setNom_Cli(usuarioParseado.Nom_Cli);
       }
-    }, [isFocused]);
+    } catch (error) {
+      console.error('Error al obtener el nombre del usuario:', error);
+    }
+  };
+  obtenerNombre();
+}, []);
 
   
     return (
@@ -45,8 +42,8 @@ const IndexScreen = ({ navigation }) => {
               </View>
               
               <Image
-                 source={require('../assets/Favicon25.png')} // o usa require si es local
-                style={{ width: 70, height: 70, borderRadius: 25 }} // círculo de 50x50
+                source={require('../assets/Favicon25.png')} // o usa require si es local
+                style={{ width: 50, height: 50, borderRadius: 25 }} // círculo de 50x50
               />
             </View>
 
@@ -93,6 +90,7 @@ const IndexScreen = ({ navigation }) => {
           
           <BottomNavBar />
         </SafeAreaView>
+       
     );
 };
 

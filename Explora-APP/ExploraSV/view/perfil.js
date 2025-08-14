@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, SafeAreaView,StatusBar  } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, SafeAreaView,StatusBar,Alert  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from './tw';
 import { updateProfile,getCurrentUser } from '../auth'; 
@@ -7,14 +7,13 @@ import BottomNavBar from './components/nav';
 import { logout } from '../auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
+import { useAuth } from '@clerk/clerk-expo';
 
 
 
 
 const ConfiguracionesScreen = ( ) => {
-  const navigation = useNavigation();
-  
+  const { signOut } = useAuth(); // <-- a
   const menuItems = [
     { title: 'Membresías', icon: 'card-outline', highlighted: true },
     { title: 'Tus favoritos', icon: 'heart-outline' },
@@ -58,16 +57,25 @@ const ConfiguracionesScreen = ( ) => {
       Alert.alert('Error', 'No se pudo actualizar el perfil');
     }
   }
-  
-  
+  const navigation = useNavigation();
   const cerrarSesion = async () => {
     try {
-      await logout();
+      // Cerrar sesión en Clerk
+      await signOut();
+      console.log('Sesión de Clerk cerrada');
+
+      // Borrar datos locales
       await AsyncStorage.removeItem('Turista');
+
+      // Navegar al login
       navigation.replace('Login');
     } catch (error) {
       console.error('Error al cerrar sesión:', error.message);
-      Alert.alert('Error', 'No se pudo cerrar sesión');
+      Alert.alert(
+        'Error',
+        'No fue posible cerrar sesión. Por favor, intenta de nuevo.',
+        [{ text: 'OK' }]
+      );
     }
   };
 
@@ -97,14 +105,14 @@ const ConfiguracionesScreen = ( ) => {
             <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Nombre: </Text>
             <TextInput
                 style={tw`bg-white rounded px-3 py-2 mb-2`}
-                value={user?.Nom_Cli || ''}
+                value={user?.Nom_Cli || 'Turista'}
                 onChangeText={(text) => setUser({ ...user, Nom_Cli: text })}
               />
 
             <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Correo</Text>
               <TextInput
                 style={tw`bg-white rounded px-3 py-2 mb-2`}
-                value={user?.Correo_Cli || ''}
+                value={user?.Correo_Cli || 'Turista'}
                 onChangeText={(text) => setUser({ ...user, Correo_Cli: text })}
               />
               <TouchableOpacity
@@ -117,16 +125,24 @@ const ConfiguracionesScreen = ( ) => {
           ) : (
             <>
             <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Nombre: </Text>
-            <Text style={tw`text-white text-lg font-bold mb-1`}> {user?.Nom_Cli || ''}</Text>
+            <Text style={tw`text-white text-lg font-bold mb-1`}> {user?.Nom_Cli || 'Turista'}</Text>
         
             <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Correo</Text>
-            <Text style={tw`text-white text-lg mb-4`}>{user?.Correo_Cli || ''}</Text>
+            <Text style={tw`text-white text-lg mb-4`}>{user?.Correo_Cli || 'Turista'}</Text>
         
             <TouchableOpacity
               style={tw`bg-teal-400 px-6 py-2 rounded-full`}
-              onPress={() => setIsEditing(true)}
+              onPress={() => {
+                if (!user) {
+                  navigation.navigate('SignUp'); // Redirige si no hay usuario
+                } else {
+                  setIsEditing(true); // Permite editar si hay usuario
+                }
+              }}
             >
-              <Text style={tw`text-white font-semibold text-center`}>Editar</Text>
+              <Text style={tw`text-white font-semibold text-center`}>
+                {user ? 'Editar' : 'Regístrate'}
+              </Text>
             </TouchableOpacity>
           </>
           )}

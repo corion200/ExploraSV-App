@@ -7,16 +7,24 @@ import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
 import Perfil from './perfil';
+import { ClerkProvider } from '@clerk/clerk-expo';
 import Search from './search';
+import Verify from './Verify';
+import Toast from 'react-native-toast-message';
 import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 import Payment from './payment';
 import DetalleLugar from './components/DetalleLugar';
 
+const tokenCache = {
+  getToken: (key) => SecureStore.getItemAsync(key),
+  saveToken: (key, value) => SecureStore.setItemAsync(key, value),
+};
 const Stack = createStackNavigator();
 
 export default function Navigation() {
   return (
+<ClerkProvider publishableKey="pk_test_Zml0dGluZy1zZWFsLTIyLmNsZXJrLmFjY291bnRzLmRldiQ" tokenCache={tokenCache}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="AuthLoading" component={AuthLoading} />
@@ -30,7 +38,11 @@ export default function Navigation() {
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Payment" component={Payment} />
         <Stack.Screen name="Reservacion" component={Reservacion} />
+        <Stack.Screen name="Verify" component={Verify} />
       </Stack.Navigator>
     </NavigationContainer>
+    <Toast /> 
+    
+    </ClerkProvider>
   );
 }
