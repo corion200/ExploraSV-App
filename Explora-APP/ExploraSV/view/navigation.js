@@ -11,6 +11,7 @@ import Search from './search';
 import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 import Payment from './payment';
+import DetalleLugar from './components/DetalleLugar';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ export default function Navigation() {
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />
+        <Stack.Screen name="DetalleLugar" component={DetalleLugar} />
         <Stack.Screen name="Search" component={Search} />
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Payment" component={Payment} />
