@@ -178,7 +178,7 @@ export default function Comentario({ Id_Siti }) {
               onPress={handlePublish}
               style={tw`bg-[#101C5D] rounded-lg py-3 px-6 items-center mb-6`}
             >
-              <Text style={tw`text-white font-semibold text-ms`}>Publicar</Text>
+              <Text style={tw`text-white font-semibold text-sm`}>Publicar</Text>
             </TouchableOpacity>
 
             <Text style={tw`text-base font-bold mb-2`}>
