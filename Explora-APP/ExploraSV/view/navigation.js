@@ -12,6 +12,7 @@ import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 import Payment from './payment';
 import DetalleLugar from './components/DetalleLugar';
+import ChatScreen from './components/chatbot/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,15 @@ export default function Navigation() {
         <Stack.Screen name="AuthLoading" component={AuthLoading} />
         <Stack.Screen name="Landing" component={Landing} />
         <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen 
+          name="ChatScreen"
+          component={ChatScreen}
+          options={{ 
+            headerTitle: "Toru - Asistente Turístico",
+            headerStyle: { backgroundColor: '#3FCFB0' },
+            headerTintColor: 'white'
+          }}
+        />
         <Stack.Screen name="Index" component={Index} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Site" component={Site} />

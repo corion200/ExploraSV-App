@@ -30,7 +30,7 @@ const BottomNavBar = ({
   const menuItems = [
     { id: 'Index', icon: 'home', label: 'Inicio' },
     { id: 'Search', icon: 'search', label: 'Search' },
-    { id: 'Asistente', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
+    { id: 'ChatScreen', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
     { id: 'Reservacion', icon: 'receipt-outline', label: 'Reservas' },
     { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
 
