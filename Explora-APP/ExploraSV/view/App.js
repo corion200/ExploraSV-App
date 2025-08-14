@@ -5,6 +5,7 @@ import tw from './tw';
 import { StatusBar } from 'react-native';
 
 
+
 const { width, height } = Dimensions.get('window');
 
 const slides = [
@@ -56,6 +57,7 @@ export default function App() {
   };
 
   return (
+    
     <SafeAreaView style={tw`flex-1`}>
     <StatusBar barStyle="light-content" backgroundColor="#101C5D" />
 
@@ -93,6 +95,8 @@ export default function App() {
         )}
       />
     </SafeAreaView>
+
+    
 
   );
 }

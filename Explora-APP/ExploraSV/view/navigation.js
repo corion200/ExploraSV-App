@@ -15,6 +15,10 @@ import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 import Payment from './payment';
 import DetalleLugar from './components/DetalleLugar';
+import Verify from './Verify';
+import { ClerkProvider } from '@clerk/clerk-expo';
+import * as SecureStore from 'expo-secure-store';
+import Toast from 'react-native-toast-message';
 
 const tokenCache = {
   getToken: (key) => SecureStore.getItemAsync(key),
