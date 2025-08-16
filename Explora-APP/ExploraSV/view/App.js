@@ -53,7 +53,7 @@ export default function App() {
   };
 
   const handleSkip = () => {
-    navigation.navigate('Index');
+    navigation.navigate('SignUp');
   };
 
   return (

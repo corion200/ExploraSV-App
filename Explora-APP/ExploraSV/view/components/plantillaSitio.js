@@ -7,10 +7,20 @@ import Comentario from "./reviewSitio";
 
 const screenWidth = Dimensions.get('window').width;
 
+// Cambia esta IP y puerto a los de tu backend local
+const BASE_URL = "http://192.168.1.17:8000/";
+
+// Normaliza datos para el componente
 const transformarDatosSitio = (datosRaw) => {
+  // Procesar imagen con ruta absoluta
+  let imagenFinal = datosRaw.image || datosRaw.imagen || datosRaw.Img || null;
+  if (imagenFinal && !imagenFinal.startsWith("http")) {
+    imagenFinal = BASE_URL + imagenFinal.replace(/^\/+/, "");
+  }
+
   return {
     Id_Siti: datosRaw.Id_Siti || datosRaw.id || null,
-    image: datosRaw.image || datosRaw.imagen || datosRaw.Img || null,
+    image: imagenFinal,
     title: datosRaw.title || datosRaw.nombre || datosRaw.Nom_Siti || datosRaw.Nom_Hotel || datosRaw.Nom_Rest || 'No especificado',
     puntaje: datosRaw.puntaje || 'N/A',
     location: datosRaw.location || datosRaw.ubicacion || datosRaw.Ubi_Siti || 'No especificado',
@@ -45,10 +55,10 @@ const PlantillaSitio = (props) => {
     navigation
   } = props;
 
-  // Normalización para asegurar datos correctos
   const displayNombre = title || props.nombre || props.Nom_Siti || props.Nom_Hotel || props.Nom_Rest || 'No especificado';
   const displayDescripcion = descripcion || props.Descrip_Siti || props.Descrip_Hotel || props.Descrip_Rest || 'No especificado';
   const displayUbicacion = location || props.ubicacion || props.Ubi_Siti || 'No especificado';
+
   const displayImagenObj = image 
     ? (typeof image === 'string' ? { uri: image } : image)
     : props.imagen
@@ -60,10 +70,11 @@ const PlantillaSitio = (props) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Imagen principal */}
         <Image
-          source={displayImagenObj}
-          style={tw`w-full h-64`}
-          resizeMode="cover"
+        source={displayImagenObj}
+        style={{ width: '100%', height: 310 }}
+        resizeMode="cover"
         />
+
 
         {/* Contenido principal */}
         <View style={tw`bg-white rounded-t-[25px] -mt-5 p-4`}>
@@ -148,17 +159,23 @@ const PlantillaSitio = (props) => {
             <FlatList
               horizontal
               data={recomendaciones}
-              renderItem={({ item }) => (
-                <View style={[tw`items-center mr-3`, { width: screenWidth * 0.3 }]}>
-                  <Image
-                    source={item.image ? { uri: item.image } : require('../../assets/reco.png')}
-                    style={tw`w-full h-20 rounded-lg`}
-                  />
-                  <Text style={tw`mt-2 text-center text-sm`}>
-                    {item.caption || 'Sin descripción'}
-                  </Text>
-                </View>
-              )}
+              renderItem={({ item }) => {
+                let recoImg = item.image;
+                if (recoImg && !recoImg.startsWith("http")) {
+                  recoImg = BASE_URL + recoImg.replace(/^\/+/, "");
+                }
+                return (
+                  <View style={[tw`items-center mr-3`, { width: screenWidth * 0.3 }]}>
+                    <Image
+                      source={recoImg ? { uri: recoImg } : require('../../assets/reco.png')}
+                      style={tw`w-full h-20 rounded-lg`}
+                    />
+                    <Text style={tw`mt-2 text-center text-sm`}>
+                      {item.caption || 'Sin descripción'}
+                    </Text>
+                  </View>
+                );
+              }}
               keyExtractor={(_, index) => index.toString()}
               showsHorizontalScrollIndicator={false}
               style={tw`mt-2 mb-4`}
@@ -169,7 +186,9 @@ const PlantillaSitio = (props) => {
         </View>
 
         {/* Comentarios */}
-        <Comentario Id_Siti={Id_Siti} />
+        {tipo === 'sitio_turistico' && (
+          <Comentario Id_Siti={Id_Siti} />
+        )}
       </ScrollView>
     </View>
   );

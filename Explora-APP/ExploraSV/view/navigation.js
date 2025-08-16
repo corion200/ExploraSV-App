@@ -6,19 +6,17 @@ import SignUp from './signUp';
 import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
+import ChatScreen from './components/chatbot/ChatScreen';
 import Perfil from './perfil';
 import { ClerkProvider } from '@clerk/clerk-expo';
 import Search from './search';
-import Verify from './Verify';
 import Toast from 'react-native-toast-message';
 import AuthLoading from './AuthLoading';
 import Reservacion from './reservacion';
 import Payment from './payment';
 import DetalleLugar from './components/DetalleLugar';
 import Verify from './Verify';
-import { ClerkProvider } from '@clerk/clerk-expo';
 import * as SecureStore from 'expo-secure-store';
-import Toast from 'react-native-toast-message';
 
 const tokenCache = {
   getToken: (key) => SecureStore.getItemAsync(key),

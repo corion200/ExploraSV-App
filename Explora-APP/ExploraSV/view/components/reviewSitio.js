@@ -136,7 +136,7 @@ export default function Comentario({ Id_Siti }) {
             <Text style={tw`mb-2`}>{item.comentario || item.Comentario}</Text>
 
             {esPropietario && (
-              <View style={tw`flex-row justify-end space-x-3`}>
+              <View style={tw`flex-row justify-end space-x-2`}>
                 <TouchableOpacity
                   onPress={() => setEditando(true)}
                   style={tw`bg-blue-600 rounded px-3 py-1 mr-2`}
@@ -157,68 +157,6 @@ export default function Comentario({ Id_Siti }) {
       </View>
     );
   };
-
-  return (
-    <View style={tw`bg-gray-100 rounded-lg p-3 mb-2`}>
-      <Text style={tw`font-semibold mb-1`}>
-        {item.usuario?.Nom_Cli || 'Anónimo'}
-      </Text>
-
-      {editando ? (
-        <>
-          <TextInput
-            value={textoEditado}
-            onChangeText={setTextoEditado}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-            style={[
-              tw`bg-white rounded border border-gray-400 p-2 mb-2`,
-              { fontSize: 14, minHeight: 60 },
-            ]}
-          />
-          <View style={tw`flex-row justify-end space-x-2`}>
-            <TouchableOpacity
-              onPress={handleEditar}
-              style={tw`bg-green-600 rounded px-4 py-1 mr-2`}
-            >
-              <Text style={tw`text-white`}>Guardar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setEditando(false)}
-              style={tw`bg-gray-400 rounded px-4 py-1`}
-            >
-              <Text style={tw`text-white`}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          <Text style={tw`mb-2`}>{item.comentario || item.Comentario}</Text>
-
-          {esPropietario && (
-            <View style={tw`flex-row justify-end space-x-3`}>
-              <TouchableOpacity
-                onPress={() => setEditando(true)}
-                style={tw`bg-blue-600 rounded px-3 py-1 mr-2`}
-              >
-                <Text style={tw`text-white`}>Editar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleEliminar}
-                style={tw`bg-red-600 rounded px-3 py-1`}
-              >
-                <Text style={tw`text-white`}>Eliminar</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </>
-      )}
-    </View>
-  );
-};
 
   return (
     <KeyboardAvoidingView
@@ -248,7 +186,7 @@ export default function Comentario({ Id_Siti }) {
             onPress={handlePublish}
             style={tw`bg-[#101C5D] rounded-lg py-3 px-6 items-center mb-6`}
           >
-            <Text style={tw`text-white font-semibold text-ms`}>Publicar</Text>
+            <Text style={tw`text-white font-semibold text-sm`}>Publicar</Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -260,23 +198,24 @@ export default function Comentario({ Id_Siti }) {
         </View>
       )}
 
-          <Text style={tw`text-base font-bold mb-2`}>
-            Comentarios recientes
+            <Text style={tw`text-base font-bold mb-2`}>
+              Comentarios recientes
+            </Text>
+          </View>
+        }
+        data={resenas}
+        contentContainerStyle={tw`px-4 pb-25`}
+        scrollEnabled={false}
+        keyExtractor={(item, index) =>
+          item.Id_Rena?.toString() || item.Id_Rena?.toString() || index.toString()
+        }
+        renderItem={({ item }) => <ResenaItem item={item} />}
+        ListEmptyComponent={
+          <Text style={tw`text-gray-500 text-center mt-4`}>
+            No hay reseñas aún.
           </Text>
-        </View>
-      }
-      data={resenas}
-      contentContainerStyle={tw`px-4 pb-25`}
-      scrollEnabled={false}
-      keyExtractor={(item, index) =>
-        item.Id_Rena?.toString() || item.Id_Rena?.toString() || index.toString()
-      }
-      renderItem={({ item }) => <ResenaItem item={item} />}
-      ListEmptyComponent={
-        <Text style={tw`text-gray-500 text-center mt-4`}>
-          No hay reseñas aún.
-        </Text>
-      }
-    />
-  </KeyboardAvoidingView>
-);
+        }
+      />
+    </KeyboardAvoidingView>
+  );
+}
