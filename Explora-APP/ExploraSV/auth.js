@@ -1,51 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './api';
 
-
-export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {
-
-  await AsyncStorage.removeItem('Turista');
+export async function login(Correo_Cli, Contra_Cli, navigation) {
   try {
-    const response = await api.post('/register', {
-      Nom_Cli,
-      Correo_Cli,
-      Contra_Cli,
-      Contra_Cli_confirmation,
-    });
-    
-
-    const token = response.data.token;
-
-    if (token) {
-      await AsyncStorage.setItem('authToken', token);
-      console.log('Usuario registrado y autenticado');
-      return response.data;
-    } else {
-      throw new Error('No se recibió token');
-    }
-  } catch (error) {
-    console.error('Error en registro:', error.response?.data || error.message);
-    return null;
-  }
-}
-
-export async function login(Correo_Cli, Contra_Cli,navigation ) {
-  try {
-    
     const response = await api.post('login', {
       Correo_Cli,
       Contra_Cli,
     });
 
-    const { token, Turista  } = response.data;
+    const { token, Turista } = response.data;
 
     if (token && Turista) {
-      // Guardar usuario en AsyncStorage
-      await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
+      const adjustedTurista = { ...Turista, Id_Cli: Turista.id };
+      await AsyncStorage.setItem('Turista', JSON.stringify(adjustedTurista));
 
-      console.log('Login exitoso:', Turista);
+      console.log('Toru dio la bienvenida a:', Turista.Nom_Cli);
 
-      // Redirigir a pantalla principal
       if (navigation && typeof navigation.reset === 'function') {
         navigation.reset({
           index: 0,
@@ -57,49 +27,86 @@ export async function login(Correo_Cli, Contra_Cli,navigation ) {
 
       return response.data;
     } else {
-      throw new Error('Datos incompletos recibidos del servidor');
+      console.log('Toru dice: Credenciales incorrectas');
+      return null;
     }
   } catch (error) {
-    console.error('Error al hacer login:', error.response?.data || error.message);
+    console.log('Toru no pudo conectarse:', error.response?.data?.message || 'Credenciales incorrectas');
     return null;
   }
 }
 
-  export async function getCurrentUser() {
-    try {
-      const user = await AsyncStorage.getItem('Turista');
-      return user ? JSON.parse(user) : null;
-    } catch (error) {
-      console.error('Error al obtener usuario:', error.message);
-      return null;
-    }
-  }
+export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {
+  await AsyncStorage.removeItem('Turista');
+  try {
+    const response = await api.post('/register', {
+      Nom_Cli,
+      Correo_Cli,
+      Contra_Cli,
+      Contra_Cli_confirmation,
+    });
+    
+    const token = response.data.token;
 
-  // Cerrar sesión
-  export async function logout(navigation) {
-    try {
-      await AsyncStorage.removeItem('Turista');
-      console.log('Sesión cerrada correctamente');
-  
-      if (navigation && typeof navigation.reset === 'function') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Login' }],
-        });
-      }
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error.message);
+    if (token) {
+      await AsyncStorage.setItem('authToken', token);
+      console.log('Toru registró exitosamente al usuario');
+      return response.data;
+    } else {
+      console.log('Toru dice: No se recibió token del servidor');
+      return { 
+        success: false, 
+        message: 'Toru no pudo completar el registro. Intenta de nuevo.' 
+      };
     }
+  } catch (error) {
+    console.log('Toru encontró un problema en el registro:', error.response?.data || error.message);
+    
+    return { 
+      success: false, 
+      message: error.response?.data?.message || 'Toru no pudo registrarte en este momento',
+      errors: error.response?.data?.errors || null
+    };
   }
+}
 
-  // Editar perfil
-  export async function updateProfile(userData) {
-    try {
-      const res = await api.put('/perfil', userData);
-      console.log('Perfil actualizado correctamente');
-      return res.data.user;  
-    } catch (error) {
-      console.error('Error al actualizar perfil:', error.response?.data || error.message);
-      throw error;
-    }
+
+export async function getCurrentUser() {
+  try {
+    const user = await AsyncStorage.getItem('Turista');
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.log('Error al obtener usuario:', error.message);
+    return null;
   }
+}
+
+// Cerrar sesión
+export async function logout(navigation) {
+  try {
+    await AsyncStorage.removeItem('Turista');
+    console.log('Sesión cerrada correctamente');
+
+    if (navigation && typeof navigation.reset === 'function') {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+  } catch (error) {
+    console.log('Error al cerrar sesión:', error.message);
+  }
+}
+
+// Editar perfil
+export async function updateProfile(userData) {
+  try {
+    const res = await api.put('/perfil', userData);
+    console.log('Perfil actualizado correctamente');
+    return res.data.user;  
+  } catch (error) {
+    console.log('Error al actualizar perfil:', error.response?.data || error.message);
+    // En este caso sí lanzamos error porque es una función que requiere manejo específico
+    throw error;
+  }
+}

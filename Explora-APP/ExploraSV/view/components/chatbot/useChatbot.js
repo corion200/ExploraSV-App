@@ -3,7 +3,7 @@ import { sendMessageToChatbot } from '../../../api/chatbot';
 
 export default function useChatbot() {
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
   const [error, setError] = useState('');
 
   const sendMessage = async (text) => {

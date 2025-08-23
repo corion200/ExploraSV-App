@@ -16,7 +16,6 @@ import { enviarResena, editarResena, eliminarResena } from '../../resenas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Comentario({ Id_Siti }) {
-
   const [reviewText, setReviewText] = useState('');
   const [Id_Cli, setIdUsuario] = useState(null);
   const [resenas, setResenas] = useState([]);
@@ -28,14 +27,19 @@ export default function Comentario({ Id_Siti }) {
         const userData = await AsyncStorage.getItem('Turista');
         if (userData) {
           const user = JSON.parse(userData);
-          setIdUsuario(user?.Id_Cli || user?.id || null);
+          console.log('Usuario cargado desde AsyncStorage:', user);
+          // Asegúrate que el objeto tenga la propiedad correcta, por ejemplo Id_Cli
+          const userId = user?.Id_Cli ?? user?.id ?? null;
+          setIdUsuario(userId);
           setUserData(user);
         } else {
           setUserData(null);
+          setIdUsuario(null);
         }
       } catch (error) {
         console.error('Error al obtener usuario:', error.message);
         setUserData(null);
+        setIdUsuario(null);
       }
     };
 
@@ -55,23 +59,27 @@ export default function Comentario({ Id_Siti }) {
   const handlePublish = async () => {
     if (!reviewText.trim()) return;
 
+    if (!Id_Cli) {
+      alert('Debes iniciar sesión para publicar una reseña.');
+      return;
+    }
+
     try {
       await enviarResena({
         Comentario: reviewText,
-        Id_Siti6: Id_Siti,   
-        Id_Cli1: Id_Cli,     
+        Id_Siti6: Id_Siti,
+        Id_Cli1: Id_Cli,
       });
 
       alert('¡Gracias por tu reseña!');
       setReviewText('');
-      obtenerResenas(); // actualizar lista después de enviar
+      obtenerResenas();
     } catch (error) {
       console.error('Error al publicar la reseña:', error);
       alert('Ocurrió un error al publicar tu reseña.');
     }
   };
 
-   // Componente para cada reseña con su propio estado
   const ResenaItem = ({ item }) => {
     const [editando, setEditando] = useState(false);
     const [textoEditado, setTextoEditado] = useState(item.Comentario || item.comentario);
@@ -86,7 +94,7 @@ export default function Comentario({ Id_Siti }) {
         console.error('Error al editar reseña:', error);
       }
     };
-    
+
     const handleEliminar = async () => {
       try {
         await eliminarResena(item.Id_Rena);
@@ -168,54 +176,59 @@ export default function Comentario({ Id_Siti }) {
           <View>
             <Text style={tw`text-base font-bold mb-4`}>Reseñas</Text>
             {userData ? (
-            <>
-          <TextInput
-            value={reviewText}
-            onChangeText={setReviewText}
-            placeholder="Escribe tu reseña aquí..."
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-            style={[
-              tw`bg-gray-100 rounded-lg text-gray-700 mb-4`,
-              { height: 100, fontSize: 14 },
-            ]}
-          />
+              <>
+                <TextInput
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                  placeholder="Escribe tu reseña aquí..."
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  style={[
+                    tw`bg-gray-100 rounded-lg text-gray-700 mb-4`,
+                    { height: 100, fontSize: 14 },
+                  ]}
+                />
 
-          <TouchableOpacity
-            onPress={handlePublish}
-            style={tw`bg-[#101C5D] rounded-lg py-3 px-6 items-center mb-6`}
-          >
-            <Text style={tw`text-white font-semibold text-sm`}>Publicar</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <View style={tw`bg-red-100 border border-red-400 rounded-lg p-4 mb-4 flex-row items-center`}>
-          <Icon name="alert-circle-outline" size={20} color="#dc2626" style={tw`mr-2`} />
-          <Text style={tw`text-red-700 font-semibold flex-shrink`}>
-            Debes iniciar sesión para poder comentar.
-          </Text>
-        </View>
-      )}
+                <TouchableOpacity
+                  onPress={handlePublish}
+                  style={tw`bg-[#101C5D] rounded-lg py-3 px-6 items-center mb-6`}
+                >
+                  <Text style={tw`text-white font-semibold text-sm`}>Publicar</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <View
+                style={tw`bg-red-100 border border-red-400 rounded-lg p-4 mb-4 flex-row items-center`}
+              >
+                <Icon
+                  name="alert-circle-outline"
+                  size={20}
+                  color="#dc2626"
+                  style={tw`mr-2`}
+                />
+                <Text style={tw`text-red-700 font-semibold flex-shrink`}>
+                  Debes iniciar sesión para poder comentar.
+                </Text>
+              </View>
+            )}
 
-            <Text style={tw`text-base font-bold mb-2`}>
-              Comentarios recientes
-            </Text>
+            <Text style={tw`text-base font-bold mb-2`}>Comentarios recientes</Text>
           </View>
         }
-        data={resenas}
-        contentContainerStyle={tw`px-4 pb-25`}
-        scrollEnabled={false}
-        keyExtractor={(item, index) =>
-          item.Id_Rena?.toString() || item.Id_Rena?.toString() || index.toString()
-        }
-        renderItem={({ item }) => <ResenaItem item={item} />}
-        ListEmptyComponent={
-          <Text style={tw`text-gray-500 text-center mt-4`}>
-            No hay reseñas aún.
-          </Text>
-        }
-      />
-    </KeyboardAvoidingView>
-  );
+      data={resenas}
+      contentContainerStyle={tw`px-4 pb-25`}
+      scrollEnabled={false}
+      keyExtractor={(item, index) =>
+        item.Id_Rena?.toString() || item.Id_Rena?.toString() || index.toString()
+      }
+      renderItem={({ item }) => <ResenaItem item={item} />}
+      ListEmptyComponent={
+        <Text style={tw`text-gray-500 text-center mt-4`}>
+          No hay reseñas aún.
+        </Text>
+      }
+    />
+  </KeyboardAvoidingView>
+);
 }

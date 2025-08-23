@@ -29,9 +29,9 @@ const BottomNavBar = ({
 
   const menuItems = [
     { id: 'Index', icon: 'home', label: 'Inicio' },
-    { id: 'Search', icon: 'search', label: 'Search' },
+    { id: 'Search', icon: 'search', label: 'Explorar' },
     { id: 'ChatScreen', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
-  
+    { id: 'MisReservas', icon: 'calendar', label: 'Reservar' },
     { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
 
   ];

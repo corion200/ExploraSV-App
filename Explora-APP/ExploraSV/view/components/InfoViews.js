@@ -27,22 +27,21 @@ export default function List({ navigation }) {
         <TouchableOpacity
           key={`indexscreen-lugar-${place.id}-${index}`}
           onPress={() => {
-            if (place.tipo === 'sitio_turistico') {
-              navigation.navigate('Site', {
-                sitio: {
-                  ...place,
-                  Id_Siti: place.id,
-                  Nom_Siti: place.nombre,
-                  Descrip_Siti: place.descripcion,
-                  Img: place.imagen
-                }
-              });
-            } else {
-              navigation.navigate('DetalleLugar', {
-                lugar: place,
+            // CAMBIO: Todos los tipos van hacia 'Site'
+            navigation.navigate('Site', {
+              sitio: {
+                ...place,
+                Id_Siti: place.id,
+                Nom_Siti: place.nombre || place.Nom_Siti,
+                Descrip_Siti: place.descripcion || place.Descrip_Siti,
+                Nom_Hotel: place.Nom_Hotel,
+                Descrip_Hotel: place.Descrip_Hotel,
+                Nom_Rest: place.Nom_Rest,
+                Descrip_Rest: place.Descrip_Rest,
+                Img: place.imagen,
                 tipo: place.tipo
-              });
-            }
+              }
+            });
           }}
           style={tw`flex-row items-center mb-4 bg-white rounded-xl p-4 shadow-sm border border-[#3333331A]`}
           activeOpacity={0.7}

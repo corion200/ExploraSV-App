@@ -423,7 +423,6 @@ export default function ChatScreen({ navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-          
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -52,24 +52,25 @@ const SearchApp = ({ navigation }) => {
 
   const renderLugar = ({ item, index }) => (
     <TouchableOpacity
-      onPress={() => {
-        if (item.tipo === 'sitio_turistico') {
-          navigation.navigate('Site', {
-            sitio: {
-              ...item,
-              Id_Siti: item.id,
-              Nom_Siti: item.nombre,
-              Descrip_Siti: item.descripcion,
-              Img: item.imagen
-            }
-          });
-        } else {
-          navigation.navigate('DetalleLugar', { lugar: item, tipo: item.tipo });
-        }
-      }}
-      style={tw`bg-white rounded-2xl shadow-md p-0 mb-5 border border-[#3333331A] overflow-hidden`}
-      activeOpacity={0.8}
-    >
+  onPress={() => {
+    navigation.navigate('Site', {
+      sitio: {
+        ...item,
+        Id_Siti: item.id,
+        Nom_Siti: item.nombre || item.Nom_Siti,
+        Descrip_Siti: item.descripcion || item.Descrip_Siti,
+        Nom_Hotel: item.Nom_Hotel,
+        Descrip_Hotel: item.Descrip_Hotel,
+        Nom_Rest: item.Nom_Rest,
+        Descrip_Rest: item.Descrip_Rest,
+        Img: item.imagen,
+        tipo: item.tipo
+      }
+    });
+  }}
+  style={tw`bg-white rounded-2xl shadow-md p-0 mb-5 border border-[#3333331A] overflow-hidden`}
+  activeOpacity={0.8}
+>
       {item.imagen ? (
         <Image
           source={{ uri: item.imagen }}
@@ -121,14 +122,6 @@ const SearchApp = ({ navigation }) => {
             onSubmitEditing={fetchResults}
           />
         </View>
-
-        <TouchableOpacity
-          onPress={fetchResults}
-          style={tw`bg-[#D4AF37] py-3 rounded-full mb-4 items-center shadow-md`}
-          activeOpacity={0.8}
-        >
-          <Text style={tw`text-white font-semibold`}>Buscar</Text>
-        </TouchableOpacity>
 
         <ScrollView 
           horizontal 

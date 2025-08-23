@@ -87,14 +87,11 @@ const IndexScreen = ({ navigation }) => {
                 
                 <TouchableOpacity 
                   style={tw`bg-[#D4AF37] px-6 py-3 rounded-full self-start flex-row items-center shadow-md`}
-                  onPress={() => navigation.navigate('Reservacion', { 
-                    tipoLugar: 'hotel', 
-                    datosLugar: { nombre: 'Hotel Paraíso', direccion: 'Calle Falsa 123' }
-                  })}
+                  onPress={() => navigation.navigate('MisReservas')}
                   activeOpacity={0.8}
                 >
                   <Icon name="calendar-check" size={18} color="white" style={tw`mr-2`} />
-                  <Text style={tw`text-base font-bold text-white`}>Reservar Ahora</Text>
+                  <Text style={tw`text-base font-bold text-white`}>Mis Reservas</Text>
                 </TouchableOpacity>
               </View>
 

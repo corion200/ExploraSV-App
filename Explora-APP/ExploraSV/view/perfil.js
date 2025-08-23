@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, SafeAreaView,StatusBar,Alert  } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from './tw';
-import { updateProfile,getCurrentUser } from '../auth'; 
+import { updateProfile, getCurrentUser } from '../auth';
 import BottomNavBar from './components/nav';
 import { logout } from '../auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,24 +11,33 @@ import { useAuth } from '@clerk/clerk-expo';
 
 
 
+const ConfiguracionesScreen = () => {
+  const { signOut } = useAuth();
+  const navigation = useNavigation();
 
-const ConfiguracionesScreen = ( ) => {
-  const { signOut } = useAuth(); // <-- a
+  // Paleta de colores
+  const colors = {
+    primary: '#101C5D',
+    secondary: '#569298',
+    complementary: '#D4AF37',
+    neutralLight: '#F5F5F5',
+    neutralDark: '#333333',
+    vibrant: '#F97C7C',
+  };
+
   const menuItems = [
-    { title: 'Membresías', icon: 'card-outline', highlighted: true },
-    { title: 'Tus favoritos', icon: 'heart-outline' },
-    { title: 'Puntos acumulados', icon: 'trophy-outline' },
-    { title: 'Cerrar Sesión', icon: 'exit-outline' },
-   
+    { title: 'Mis Reservas', icon: 'calendar-outline', screen: 'MisReservas', color: colors.complementary },
+    { title: 'Tus favoritos', icon: 'heart-outline', screen: 'Favoritos', color: colors.vibrant },
+    { title: 'Puntos acumulados', icon: 'trophy-outline', screen: 'Puntos', color: colors.secondary },
+    { title: 'Configuraciones', icon: 'settings-outline', screen: 'Settings', color: colors.neutralDark },
+    { title: 'Ayuda y soporte', icon: 'help-circle-outline', screen: 'HelpSupport', color: colors.secondary },
+    { title: 'Cerrar Sesión', icon: 'exit-outline', isLogout: true, color: colors.vibrant },
   ];
- 
-  // Estados para los valores, pueden venir de props o API
+
   const [isEditing, setIsEditing] = useState(false);
-  
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar usuario
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -47,146 +56,299 @@ const ConfiguracionesScreen = ( ) => {
     try {
       const updatedUser = await updateProfile(user);
       setUser(updatedUser);
-  
-      // Guarda en AsyncStorage el usuario actualizado
+
       await AsyncStorage.setItem('Turista', JSON.stringify(updatedUser));
-  
+
       setIsEditing(false);
       Alert.alert('Éxito', 'Perfil actualizado correctamente');
     } catch (error) {
       Alert.alert('Error', 'No se pudo actualizar el perfil');
     }
-  }
-  const navigation = useNavigation();
+  };
+
   const cerrarSesion = async () => {
-    try {
-      // Cerrar sesión en Clerk
-      await signOut();
-      console.log('Sesión de Clerk cerrada');
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Cerrar Sesión',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+              await AsyncStorage.removeItem('Turista');
+              navigation.replace('Login');
+            } catch (error) {
+              Alert.alert('Error', 'No fue posible cerrar sesión. Por favor, intenta de nuevo.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
-      // Borrar datos locales
-      await AsyncStorage.removeItem('Turista');
-
-      // Navegar al login
-      navigation.replace('Login');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error.message);
-      Alert.alert(
-        'Error',
-        'No fue posible cerrar sesión. Por favor, intenta de nuevo.',
-        [{ text: 'OK' }]
-      );
+  const handleMenuPress = (item) => {
+    if (item.isLogout) {
+      cerrarSesion();
+    } else if (item.screen) {
+      navigation.navigate(item.screen);
+    } else {
+      console.log('Tocaste:', item.title);
     }
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-white pb-20`}>
-    <StatusBar barStyle="light-content" backgroundColor="#101C5D" />
-      <ScrollView style={tw`flex-1`}>
-        {/* Header con perfil */}
-        <View style={tw`bg-[#101C5D] px-6 h-103 rounded-b-3xl`}>
-          <Text style={tw`text-xl  text-white pt-10 mb-10`}>
-            Configuraciones
-          </Text>
+    <SafeAreaView style={[tw`flex-1 pb-20`, { backgroundColor: colors.neutralLight }]}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+      
+      <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
+        {/* Header con perfil mejorado */}
+        <View style={[tw`px-6 pt-4 pb-8 rounded-b-3xl`, { backgroundColor: colors.primary, minHeight: 320 }]}>
+          <View style={tw`flex-row items-center justify-between mb-8`}>
+            <Text style={tw`text-2xl font-bold text-white`}>Mi Perfil</Text>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={tw`p-2`}
+            >
+              <Ionicons name="close" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
           
           <View style={tw`items-center`}>
-            {/* Imagen de perfil */}
-            <View style={tw`w-24 h-24 rounded-full bg-pink-200 mb-4 overflow-hidden`}>
-              <Image
-                source={{
-                  uri: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face'
-                }}
-                style={tw`w-full h-full`}
-                resizeMode="cover"
-              />
-            </View>
-            {isEditing ? (
-            <>
-            <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Nombre: </Text>
-            <TextInput
-                style={tw`bg-white rounded px-3 py-2 mb-2`}
-                value={user?.Nom_Cli || 'Turista'}
-                onChangeText={(text) => setUser({ ...user, Nom_Cli: text })}
-              />
-
-            <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Correo</Text>
-              <TextInput
-                style={tw`bg-white rounded px-3 py-2 mb-2`}
-                value={user?.Correo_Cli || 'Turista'}
-                onChangeText={(text) => setUser({ ...user, Correo_Cli: text })}
-              />
-              <TouchableOpacity
-                style={tw`bg-teal-400 px-6 py-2 rounded-full`}
-                onPress={handleSave} 
+            {/* Imagen de perfil con border y sombra */}
+            <View style={tw`relative mb-4`}>
+              <View 
+                style={[
+                  tw`w-28 h-28 rounded-full overflow-hidden`,
+                  { 
+                    borderWidth: 4, 
+                    borderColor: colors.complementary,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 8
+                  }
+                ]}
               >
-                <Text style={tw`text-white font-semibold text-center`}>Guardar</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-            <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Nombre: </Text>
-            <Text style={tw`text-white text-lg font-bold mb-1`}> {user?.Nom_Cli || 'Turista'}</Text>
-        
-            <Text style={tw`text-white text-base opacity-80 font-semibold mb-1`}>Correo</Text>
-            <Text style={tw`text-white text-lg mb-4`}>{user?.Correo_Cli || 'Turista'}</Text>
-        
-            <TouchableOpacity
-              style={tw`bg-teal-400 px-6 py-2 rounded-full`}
-              onPress={() => {
-                if (!user) {
-                  navigation.navigate('SignUp'); // Redirige si no hay usuario
-                } else {
-                  setIsEditing(true); // Permite editar si hay usuario
-                }
-              }}
-            >
-              <Text style={tw`text-white font-semibold text-center`}>
-                {user ? 'Editar' : 'Regístrate'}
-              </Text>
-            </TouchableOpacity>
-          </>
-          )}
+                <Image
+                  source={
+                    user?.avatar 
+                      ? { uri: user.avatar }
+                      : require('../assets/Favicon25.png')  // Cambiar aquí
+                  }
+                  style={tw`w-full h-full`}
+                  resizeMode="cover"
+                />
+              </View>
+              
+              {/* Badge de verificación */}
+              <View 
+                style={[
+                  tw`absolute -bottom-1 -right-1 w-8 h-8 rounded-full items-center justify-center`,
+                  { backgroundColor: colors.complementary }
+                ]}
+              >
+                <Ionicons name="checkmark" size={16} color="white" />
+              </View>
+            </View>
+
+            {/* Información del usuario */}
+            {isEditing ? (
+              <View style={tw`w-full max-w-xs`}>
+                <View style={tw`mb-4`}>
+                  <Text style={tw`text-white text-sm font-medium mb-2 opacity-90`}>
+                    Nombre completo
+                  </Text>
+                  <TextInput
+                    style={[
+                      tw`bg-white rounded-xl px-4 py-3 text-base`,
+                      { color: colors.neutralDark }
+                    ]}
+                    value={user?.Nom_Cli || ''}
+                    onChangeText={(text) => setUser({ ...user, Nom_Cli: text })}
+                    placeholder="Ingresa tu nombre"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+
+                <View style={tw`mb-6`}>
+                  <Text style={tw`text-white text-sm font-medium mb-2 opacity-90`}>
+                    Correo electrónico
+                  </Text>
+                  <TextInput
+                    style={[
+                      tw`bg-white rounded-xl px-4 py-3 text-base`,
+                      { color: colors.neutralDark }
+                    ]}
+                    value={user?.Correo_Cli || ''}
+                    onChangeText={(text) => setUser({ ...user, Correo_Cli: text })}
+                    placeholder="correo@ejemplo.com"
+                    placeholderTextColor="#9CA3AF"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+
+                <View style={tw`flex-row justify-between`}>
+                  <TouchableOpacity
+                    style={[
+                      tw`flex-1 py-3 rounded-xl mr-2 flex-row items-center justify-center`,
+                      { backgroundColor: colors.neutralDark + '20' }
+                    ]}
+                    onPress={() => setIsEditing(false)}
+                  >
+                    <Ionicons name="close" size={18} color="white" style={tw`mr-2`} />
+                    <Text style={tw`text-white font-semibold`}>Cancelar</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      tw`flex-1 py-3 rounded-xl ml-2 flex-row items-center justify-center`,
+                      { backgroundColor: colors.complementary }
+                    ]}
+                    onPress={handleSave}
+                  >
+                    <Ionicons name="checkmark" size={18} color="white" style={tw`mr-2`} />
+                    <Text style={tw`text-white font-semibold`}>Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={tw`items-center w-full`}>
+                <Text style={tw`text-white text-2xl font-bold mb-1`}>
+                  {user?.Nom_Cli || 'Turista'}
+                </Text>
+                <Text style={tw`text-white opacity-80 text-base mb-6`}>
+                  {user?.Correo_Cli || 'correo@ejemplo.com'}
+                </Text>
+
+                <TouchableOpacity
+                  style={[
+                    tw`px-8 py-3 rounded-xl flex-row items-center`,
+                    { backgroundColor: colors.complementary }
+                  ]}
+                  onPress={() => {
+                    if (!user) {
+                      navigation.navigate('SignUp');
+                    } else {
+                      setIsEditing(true);
+                    }
+                  }}
+                >
+                  <Ionicons 
+                    name={user ? "create-outline" : "person-add-outline"} 
+                    size={20} 
+                    color="white" 
+                    style={tw`mr-2`} 
+                  />
+                  <Text style={tw`text-white font-bold text-base`}>
+                    {user ? 'Editar Perfil' : 'Registrarse'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
 
-        {/* Lista de opciones */}
-        <View style={tw`px-4 py-6`}>
-          {menuItems.map((item, index) => (
-           <TouchableOpacity
-           key={index}
-           style={tw`flex-row items-center justify-between p-4 mb-3 rounded-xl`}
-           onPress={() => {
-             if (item.title === 'Cerrar Sesión') {
-               cerrarSesion();
-             } else {
+        {/* Estadísticas rápidas */}
+        <View style={tw`px-6 -mt-6 mb-6`}>
+          <View style={tw`bg-white rounded-2xl p-4 shadow-lg`}>
+            <Text style={[tw`text-lg font-bold mb-4`, { color: colors.primary }]}>
+              Tu actividad
+            </Text>
+            <View style={tw`flex-row justify-around`}>
+              <View style={tw`items-center`}>
+                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.secondary + '20' }]}>
+                  <Ionicons name="calendar" size={24} color={colors.secondary} />
+                </View>
+                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>5</Text>
+                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Reservas</Text>
+              </View>
+              
+              <View style={tw`items-center`}>
+                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.vibrant + '20' }]}>
+                  <Ionicons name="heart" size={24} color={colors.vibrant} />
+                </View>
+                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>12</Text>
+                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Favoritos</Text>
+              </View>
+              
+              <View style={tw`items-center`}>
+                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.complementary + '20' }]}>
+                  <Ionicons name="trophy" size={24} color={colors.complementary} />
+                </View>
+                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>850</Text>
+                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Puntos</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
-               console.log('Tocaste:', item.title);
-             }
-           }}
-         >
-           <View style={tw`flex-row items-center`}>
-             <Ionicons name={item.icon} size={24} />
-             <Text style={tw`ml-3 text-lg`}>
-               {item.title}
-             </Text>
-           </View>
-           
-           {item.hasToggle ? (
-             <View style={tw`flex-row items-center`}>
-               <Ionicons name="sunny-outline" size={20} color="#6b7280" />
-               <View style={tw`w-12 h-6 bg-gray-300 rounded-full ml-2 relative`}>
-                 <View style={tw`w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm`} />
-               </View>
-             </View>
-           ) : (
-             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-           )}
-         </TouchableOpacity>
+        {/* Lista de opciones mejorada */}
+        <View style={tw`px-6 pb-6`}>
+          <Text style={[tw`text-lg font-bold mb-4`, { color: colors.primary }]}>
+            Configuraciones
+          </Text>
+          
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                tw`flex-row items-center justify-between p-4 mb-3 rounded-2xl bg-white`,
+                {
+                  shadowColor: colors.neutralDark,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }
+              ]}
+              onPress={() => handleMenuPress(item)}
+              activeOpacity={0.7}
+            >
+              <View style={tw`flex-row items-center flex-1`}>
+                <View 
+                  style={[
+                    tw`w-12 h-12 rounded-xl items-center justify-center mr-4`,
+                    { backgroundColor: item.color + '15' }
+                  ]}
+                >
+                  <Ionicons name={item.icon} size={24} color={item.color} />
+                </View>
+                
+                <View style={tw`flex-1`}>
+                  <Text style={[tw`text-base font-semibold`, { color: colors.neutralDark }]}>
+                    {item.title}
+                  </Text>
+                  {item.subtitle && (
+                    <Text style={[tw`text-sm mt-1`, { color: colors.neutralDark + '80' }]}>
+                      {item.subtitle}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              
+              <Ionicons 
+                name="chevron-forward" 
+                size={20} 
+                color={colors.neutralDark + '60'} 
+              />
+            </TouchableOpacity>
           ))}
         </View>
+
+        {/* Footer con versión */}
+        <View style={tw`px-6 pb-8 items-center`}>
+          <Text style={[tw`text-sm`, { color: colors.neutralDark + '80' }]}>
+            Versión 1.0.0
+          </Text>
+        </View>
       </ScrollView>
-      <BottomNavBar 
-                  />
+      
+      <BottomNavBar />
     </SafeAreaView>
   );
 };
