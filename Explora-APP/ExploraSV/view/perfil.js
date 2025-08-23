@@ -222,7 +222,7 @@ const ConfiguracionesScreen = () => {
                   {user?.Nom_Cli || 'Turista'}
                 </Text>
                 <Text style={tw`text-white opacity-80 text-base mb-6`}>
-                  {user?.Correo_Cli || 'correo@ejemplo.com'}
+                  {user?.Correo_Cli}
                 </Text>
 
                 <TouchableOpacity

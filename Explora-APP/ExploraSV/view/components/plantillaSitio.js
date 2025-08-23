@@ -6,7 +6,6 @@ import Comentario from "./reviewSitio";
 
 const screenWidth = Dimensions.get('window').width;
 
-const BASE_URL = "http://192.168.1.17:8000/";
 // Cambia esta IP y puerto a los de tu backend local
 const BASE_URL = "http://192.168.0.13:8000/";
 
@@ -104,7 +103,11 @@ const transformarDatosSitio = (datosRaw) => {
     precios: datosRaw.Precio_Entra_Siti ? [datosRaw.Precio_Entra_Siti] : [],
     actividades: datosRaw.Activi_Siti ? 
       datosRaw.Activi_Siti.split(',').map(act => ({ label: act.trim() })) : [],
-    recomendaciones: datosRaw.recomendaciones || [],
+      recomendaciones: datosRaw.Recomendacione_Siti 
+      ? datosRaw.Recomendacione_Siti.split(',').map(reco => ({
+          caption: reco.trim(), 
+        }))
+      : [],
     
     // Datos adicionales
     zona: datosRaw.Nom_Zon || datosRaw.zona,
@@ -196,7 +199,7 @@ const PlantillaSitio = (props) => {
         </View>
 
         {/* Contenido principal */}
-        <View style={[tw`bg-white rounded-t-[25px] px-6 pt-6 pb-10 -mt-6`, { shadowColor: colors.neutralDark, shadowOpacity: 0.1, shadowRadius: 6 }]}>
+        <View style={[tw`bg-white rounded-t-[25px] px-5 pt-6 pb-10 -mt-6`, { shadowColor: colors.neutralDark, shadowOpacity: 0.1, shadowRadius: 6 }]}>
           <Text style={{ fontSize: 26, fontWeight: '700', color: colors.primary, marginBottom: 6 }}>
             {displayNombre} <Ionicons name="leaf-outline" size={20} color={colors.secondary} />
           </Text>
@@ -340,7 +343,7 @@ const PlantillaSitio = (props) => {
                       style={{
                         width: 72,
                         alignItems: 'center',
-                        marginRight: 16,
+                        marginRight: 10,
                         marginBottom: 12,
                       }}
                     >
@@ -394,10 +397,6 @@ const PlantillaSitio = (props) => {
                           borderRadius: 14,
                           overflow: 'hidden',
                           backgroundColor: colors.neutralLight,
-                          shadowColor: colors.neutralDark,
-                          shadowOpacity: 0.1,
-                          shadowRadius: 6,
-                          elevation: 4,
                           paddingBottom: 8,
                         }}
                       >
@@ -430,12 +429,8 @@ const PlantillaSitio = (props) => {
             </>
           )}
 
-          {/* Comentarios - solo para sitios turísticos */}
-          {tipo === 'sitio_turistico' && (
-            <View style={{ marginTop: 12 }}>
-              <Comentario Id_Siti={Id_Siti} />
-            </View>
-          )}
+         {/* Para sitios turísticos */}
+         <Comentario Id_Siti={Id_Siti} tipo={tipo} />
         </View>
       </ScrollView>
     </View>

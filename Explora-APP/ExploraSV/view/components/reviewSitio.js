@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {
@@ -15,41 +16,46 @@ import api from '../../api';
 import { enviarResena, editarResena, eliminarResena } from '../../resenas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Comentario({ Id_Siti }) {
+export default function Comentario({ Id_Siti, tipo}) {
   const [reviewText, setReviewText] = useState('');
   const [Id_Cli, setIdUsuario] = useState(null);
   const [resenas, setResenas] = useState([]);
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    const cargarIdUsuario = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('Turista');
-        if (userData) {
-          const user = JSON.parse(userData);
-          console.log('Usuario cargado desde AsyncStorage:', user);
-          // Asegúrate que el objeto tenga la propiedad correcta, por ejemplo Id_Cli
-          const userId = user?.Id_Cli ?? user?.id ?? null;
-          setIdUsuario(userId);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const cargarUsuario = async () => {
+        try {
+          const userData = await AsyncStorage.getItem('Turista');
+          if (!isActive) return;
+  
+          const user = userData ? JSON.parse(userData) : null;
           setUserData(user);
-        } else {
+          setIdUsuario(user?.Id_Cli ?? null);
+  
+          // 🔹 Cargar reseñas después de tener el Id del usuario
+          obtenerResenas(user?.Id_Cli ?? null);
+        } catch (error) {
+          console.error('Error al cargar usuario:', error);
           setUserData(null);
           setIdUsuario(null);
         }
-      } catch (error) {
-        console.error('Error al obtener usuario:', error.message);
-        setUserData(null);
-        setIdUsuario(null);
-      }
-    };
-
-    cargarIdUsuario();
-    obtenerResenas();
-  }, []);
+      };
+  
+      cargarUsuario();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [Id_Siti])
+  );
 
   const obtenerResenas = async () => {
     try {
-      const response = await api.get(`/lugares/${Id_Siti}/reviews`);
+      const tipoLugar = tipo === 'sitio_turistico' ? 'sitio' : tipo === 'hotel' ? 'hotel' : 'restaurante';
+      const response = await api.get(`/lugares/${tipoLugar}/${Id_Siti}/reviews`);
       setResenas(response.data);
     } catch (error) {
       console.error('Error al obtener reseñas:', error);
@@ -58,27 +64,27 @@ export default function Comentario({ Id_Siti }) {
 
   const handlePublish = async () => {
     if (!reviewText.trim()) return;
-
     if (!Id_Cli) {
       alert('Debes iniciar sesión para publicar una reseña.');
       return;
     }
-
+  
     try {
       await enviarResena({
         Comentario: reviewText,
-        Id_Siti6: Id_Siti,
         Id_Cli1: Id_Cli,
+        tipoLugar: tipo === 'sitio_turistico' ? 'sitio' : tipo === 'hotel' ? 'hotel' : 'restaurante',
+        idLugar: Id_Siti
       });
-
-      alert('¡Gracias por tu reseña!');
+  
       setReviewText('');
-      obtenerResenas();
+      obtenerResenas(Id_Cli);
     } catch (error) {
       console.error('Error al publicar la reseña:', error);
       alert('Ocurrió un error al publicar tu reseña.');
     }
   };
+  
 
   const ResenaItem = ({ item }) => {
     const [editando, setEditando] = useState(false);
@@ -107,7 +113,7 @@ export default function Comentario({ Id_Siti }) {
     return (
       <View style={tw`bg-gray-100 rounded-lg p-3 mb-2`}>
         <Text style={tw`font-semibold mb-1`}>
-          {item.usuario?.Nom_Cli || 'Anónimo'}
+          {item.turista?.Nom_Cli || 'Anónimo'}
         </Text>
 
         {editando ? (

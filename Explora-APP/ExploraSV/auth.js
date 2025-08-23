@@ -1,21 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './api';
 
-export async function login(Correo_Cli, Contra_Cli, navigation) {
+export async function login(Correo_Cli, Contra_Cli, navigation,Id_Cli) {
   try {
     const response = await api.post('login', {
       Correo_Cli,
       Contra_Cli,
+      Id_Cli
     });
 
     const { token, Turista } = response.data;
 
     if (token && Turista) {
-      const adjustedTurista = { ...Turista, Id_Cli: Turista.id };
-      await AsyncStorage.setItem('Turista', JSON.stringify(adjustedTurista));
-
+      // Guarda el usuario completo tal cual viene
+      await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
+    
       console.log('Toru dio la bienvenida a:', Turista.Nom_Cli);
-
+    
       if (navigation && typeof navigation.reset === 'function') {
         navigation.reset({
           index: 0,
@@ -24,7 +25,7 @@ export async function login(Correo_Cli, Contra_Cli, navigation) {
       } else if (navigation && typeof navigation.navigate === 'function') {
         navigation.navigate('Index');
       }
-
+    
       return response.data;
     } else {
       console.log('Toru dice: Credenciales incorrectas');
