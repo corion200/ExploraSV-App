@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import tw from './tw';
+import BottomNavBar from './components/nav';
 import { obtenerMisReservas } from './../api/reservas';
 
 export default function MisReservas({ navigation }) {
@@ -267,14 +268,7 @@ export default function MisReservas({ navigation }) {
         colors={[colors.primary, colors.secondary]}
         style={tw`px-6 py-4 rounded-b-3xl mb-4`}
       >
-        <View style={tw`flex-row items-center justify-between`}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={tw`bg-white/20 p-3 rounded-xl`}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-          
+        <View style={tw`flex-row items-center justify-between`}>          
           <Text style={tw`text-white text-2xl font-bold flex-1 text-center mx-4`}>
             Mis Reservas
           </Text>
@@ -332,6 +326,7 @@ export default function MisReservas({ navigation }) {
           })}
         />
       )}
+      <BottomNavBar />
     </SafeAreaView>
   );
 }

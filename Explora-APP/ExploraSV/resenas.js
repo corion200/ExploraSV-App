@@ -1,22 +1,31 @@
 import api from './api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// tipoLugar puede ser: 'sitio', 'hotel', 'restaurante'
-// idLugar es el ID del sitio/hotel/restaurante correspondiente
-export const enviarResena = async ({ Comentario, tipoLugar, idLugar, Id_Cli1 }) => {
+// tipoLugar: 'sitio' | 'hotel' | 'restaurante'
+export const enviarResena = async ({ Comentario, tipoLugar, idLugar }) => {
   try {
-    const payload = { Comentario, Id_Cli1 };
+    // Obtener token y usuario
+    const token = await AsyncStorage.getItem('token');
+    const rawUser = await AsyncStorage.getItem('Turista');
+    if (!token || !rawUser) throw new Error('No autenticado');
 
-    // Asignar el ID según el tipo
+    const user = JSON.parse(rawUser);
+
+    // Resolver ID de usuario con tolerancia a nombres
+    const userId =
+      user.Id_Cli1 ?? user.Id_Cli ?? user.id ?? user.ID ?? user.userId ?? null;
+    if (!userId) throw new Error('ID de usuario no disponible');
+
+    // Construir payload según tipo
+    const payload = { Comentario, Id_Cli1: userId };
     if (tipoLugar === 'sitio') payload.Id_Siti6 = idLugar;
-    if (tipoLugar === 'hotel') payload.Id_Hotel5 = idLugar;
-    if (tipoLugar === 'restaurante') payload.Id_Rest4 = idLugar;
+    else if (tipoLugar === 'hotel') payload.Id_Hotel5 = idLugar;
+    else if (tipoLugar === 'restaurante') payload.Id_Rest4 = idLugar;
+    else throw new Error('tipoLugar inválido');
 
+    // Enviar
     const response = await api.post('/reviews', payload);
-
-    if (response.status !== 201) {
-      throw new Error('Error al enviar reseña');
-    }
+    if (response.status !== 201) throw new Error('Error al enviar reseña');
 
     return response.data;
   } catch (error) {
@@ -24,6 +33,7 @@ export const enviarResena = async ({ Comentario, tipoLugar, idLugar, Id_Cli1 }) 
     throw error;
   }
 };
+
 
 // Editar reseña (no cambia, sigue usando solo Id_Rena y Comentario)
 export const editarResena = async ({ Id_Rena, Comentario }) => {

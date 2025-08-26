@@ -1,42 +1,45 @@
-// api/reservas.js - Archivo completo
+// api/reservas.js - ACTUALIZADO COMPLETO
 import api from '../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Función para crear una reserva
+// Función para crear una reserva - ACTUALIZADA
 export const crearReserva = async (payload) => {
   try {
-    console.log('📤 Enviando reserva a la API:', payload);
     const token = await AsyncStorage.getItem('token');
-    if (!token) throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
+    if (!token) throw new Error('No hay token de autenticación');
 
+    // NO necesitas enviar Id_Cli5 si usas Sanctum y el usuario está autenticado; Laravel lo detecta del token
+    // Pero si lo tienes en el payload no pasa nada, Laravel ignorará el dato recibido
     const response = await api.post('/crear-reserva', payload, {
       headers: {
-        ...(api.defaults.headers?.common || {}),
         Accept: 'application/json',
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
-
-    console.log('✅ Respuesta de la API:', response.data);
     return response.data;
   } catch (error) {
     console.error('❌ Error en crearReserva:', error);
     console.error('❌ Response status:', error.response?.status);
     console.error('❌ Response data:', error.response?.data);
     
-    // Manejo específico de errores de validación (422)
+    // Manejo específico de errores del controlador Laravel
     if (error.response?.status === 422) {
       const errorData = error.response.data;
       
-      if (errorData.errors) {
+      // Errores específicos del controlador
+      if (errorData.error === 'Capacidad insuficiente') {
+        throw new Error(`${errorData.message}\nDisponible: ${errorData.capacidad_disponible} personas`);
+      } else if (errorData.error === 'Habitación no disponible') {
+        throw new Error(errorData.message);
+      } else if (errorData.error === 'Habitación inválida') {
+        throw new Error(errorData.message);
+      } else if (errorData.errors) {
         // Errores de validación de Laravel
         const validationMessages = Object.values(errorData.errors).flat();
         throw new Error(`Errores de validación:\n${validationMessages.join('\n')}`);
       } else if (errorData.message) {
         throw new Error(errorData.message);
-      } else if (errorData.error) {
-        throw new Error(errorData.error);
       }
       
       throw new Error('Error de validación en los datos enviados');
@@ -58,7 +61,7 @@ export const crearReserva = async (payload) => {
   }
 };
 
-// api/reservas.js - Función actualizada
+// Función para obtener mis reservas - SIN CAMBIOS
 export const obtenerMisReservas = async () => {
   try {
     console.log('📡 Iniciando petición a misReservas...');
@@ -78,11 +81,9 @@ export const obtenerMisReservas = async () => {
 
     console.log('✅ Respuesta API misReservas recibida:', response.data);
     
-    // ✅ Verificar que la respuesta tenga el formato esperado
     if (response.data && response.data.success && Array.isArray(response.data.reservas)) {
-      return response.data; // { success: true, reservas: [...] }
+      return response.data;
     } else if (response.data && Array.isArray(response.data)) {
-      // Si la API devuelve directamente un array
       return { success: true, reservas: response.data };
     } else {
       console.warn('⚠️ Formato de respuesta inesperado:', response.data);
@@ -94,19 +95,18 @@ export const obtenerMisReservas = async () => {
     console.error('❌ Response status:', error.response?.status);
     console.error('❌ Response data:', error.response?.data);
     
-    // ✅ En caso de error, devolver estructura consistente
     throw new Error(error.response?.data?.message || error.message || 'Error al obtener reservas');
   }
 };
 
-
-// Función para cancelar reserva
+// Función para cancelar reserva - SIN CAMBIOS
 export const cancelarReserva = async (idReserva) => {
   try {
     const token = await AsyncStorage.getItem('token');
     if (!token) throw new Error('No hay token de autenticación');
 
-    const response = await api.put(`/reservas/${idReserva}/cancelar`, {}, {
+    // ✅ USAR LA RUTA CORRECTA SEGÚN TU ARCHIVO DE RUTAS
+    const response = await api.patch(`/cancelar-reserva/${idReserva}`, {}, {
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${token}`,
@@ -116,6 +116,13 @@ export const cancelarReserva = async (idReserva) => {
     return response.data;
   } catch (error) {
     console.error('❌ Error cancelando reserva:', error);
-    throw error;
+    
+    if (error.response?.status === 404) {
+      throw new Error('Reserva no encontrada');
+    } else if (error.response?.status === 422) {
+      throw new Error('La reserva ya está cancelada');
+    }
+    
+    throw new Error(error.response?.data?.message || 'Error al cancelar la reserva');
   }
 };

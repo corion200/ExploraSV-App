@@ -25,7 +25,6 @@ export default function PlantillaReservacion() {
   const route = useRoute();
   const { tipoLugar, datosLugar } = route.params;
 
-  // Estados
   const [cantidadPersonas, setCantidadPersonas] = useState(2);
   const [fechaInicioDate, setFechaInicioDate] = useState(null);
   const [fechaFinDate, setFechaFinDate] = useState(null);
@@ -36,24 +35,60 @@ export default function PlantillaReservacion() {
   const [loading, setLoading] = useState(false);
   const [loadingHabitaciones, setLoadingHabitaciones] = useState(false);
   const [showHabitacionPicker, setShowHabitacionPicker] = useState(false);
+
+  // NUEVO: Estados para datos completos con precios
+  const [datosCompletos, setDatosCompletos] = useState(null);
+  const [loadingDatos, setLoadingDatos] = useState(false);
+
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [pickerMode, setPickerMode] = useState("date");
   const [currentPicker, setCurrentPicker] = useState(null);
 
-  // Mapear tipos de habitación a valores válidos del backend
-  const mapearTipoHabitacion = (tipoFromAPI) => {
-    const mapeo = {
-      'Individual': 'sencilla',
-      'Doble': 'doble', 
-      'Suite': 'suite',
-      'Matrimonial': 'doble',
-      'Familiar': 'suite',
-      'Sencilla': 'sencilla',
-      'sencilla': 'sencilla',
-      'doble': 'doble',
-      'suite': 'suite'
-    };
-    return mapeo[tipoFromAPI] || 'sencilla';
+  // NUEVO: Función para cargar datos completos del lugar (incluyendo precios)
+  const cargarDatosCompletos = async () => {
+    if (!datosLugar?.id) return;
+    
+    setLoadingDatos(true);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      let url = '';
+      
+      switch (tipoLugar) {
+        case 'hotel':
+          url = `http://192.168.1.17:8000/api/hoteles/${datosLugar.id}`;
+          break;
+        case 'restaurante':
+          url = `http://192.168.1.17:8000/api/restaurantes/${datosLugar.id}`;
+          break;
+        case 'sitio_turistico':
+          url = `http://192.168.1.17:8000/api/sitios/${datosLugar.id}`;
+          break;
+        default:
+          setDatosCompletos(datosLugar);
+          return;
+      }
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setDatosCompletos(data);
+    } catch (error) {
+      console.error('Error cargando datos completos:', error);
+      // Usar datos originales si falla
+      setDatosCompletos(datosLugar);
+    } finally {
+      setLoadingDatos(false);
+    }
   };
 
   // Cargar habitaciones disponibles si es hotel
@@ -61,6 +96,11 @@ export default function PlantillaReservacion() {
     if (tipoLugar === 'hotel' && datosLugar?.id) {
       cargarHabitacionesDisponibles();
     }
+  }, [tipoLugar, datosLugar]);
+
+  // NUEVO: Cargar datos completos
+  useEffect(() => {
+    cargarDatosCompletos();
   }, [tipoLugar, datosLugar]);
 
   const cargarHabitacionesDisponibles = async () => {
@@ -94,10 +134,8 @@ export default function PlantillaReservacion() {
     }
   };
 
-  // Función mejorada para formatear fecha API
   const formatearFechaAPI = (fecha, hora) => {
     if (!fecha) return null;
-    
     const yyyy = fecha.getFullYear();
     const mm = (fecha.getMonth() + 1).toString().padStart(2, "0");
     const dd = fecha.getDate().toString().padStart(2, "0");
@@ -139,7 +177,7 @@ export default function PlantillaReservacion() {
     if ((currentPicker === "inicio_hora" || currentPicker === "fin_hora") && 
         (tipoLugar === 'hotel' || tipoLugar === 'restaurante')) {
       
-      const { horario_inicio, horario_fin, HoraI_Hotel, HoraF_Hotel, HoraI_Rest, HoraF_Rest } = datosLugar;
+      const { horario_inicio, horario_fin, HoraI_Hotel, HoraF_Hotel, HoraI_Rest, HoraF_Rest } = datosCompletos || datosLugar;
       const horaInicioNegocio = horario_inicio || HoraI_Hotel || HoraI_Rest;
       const horaFinNegocio = horario_fin || HoraF_Hotel || HoraF_Rest;
       
@@ -190,20 +228,28 @@ export default function PlantillaReservacion() {
     return noches > 0 ? noches : 0;
   };
 
-  // Cálculo de precios
+  // ACTUALIZADO: Función de cálculo de precios con datos de la BD
   const calcularPrecios = () => {
-    let precioPorNoche = 50;
+    let precioPorNoche = 50; // Precio base por defecto
     const noches = calcularNoches();
+    const datos = datosCompletos || datosLugar;
     
     if (tipoLugar === 'hotel' && habitacionSeleccionada) {
+      // Usar el precio por noche de la habitación seleccionada
       const habitacion = habitacionesDisponibles.find(h => h.id === habitacionSeleccionada);
       precioPorNoche = habitacion ? parseFloat(habitacion.costo) : 50;
     } else if (tipoLugar === 'restaurante') {
-      precioPorNoche = 25;
+      // NUEVO: Usar precio de la base de datos multiplicado por personas
+      const precioRestaurante = datos.Precio_Rest || datos.precio || 25;
+      precioPorNoche = parseFloat(precioRestaurante) * cantidadPersonas;
     } else if (tipoLugar === 'sitio_turistico') {
-      precioPorNoche = 15;
+      // Usar precio de la base de datos multiplicado por personas
+      const precioSitio = datos.Precio_Siti || datos.precio || 15;
+      precioPorNoche = parseFloat(precioSitio) * cantidadPersonas;
     }
     
+    // Para hoteles: multiplicar por número de noches
+    // Para restaurantes y sitios: precio ya calculado con personas
     const subTotal = tipoLugar === 'hotel' ? precioPorNoche * noches : precioPorNoche;
     const costoServicio = 10;
     const total = subTotal + costoServicio;
@@ -213,7 +259,7 @@ export default function PlantillaReservacion() {
 
   const { subTotal, costoServicio, total, precioPorNoche, noches } = calcularPrecios();
 
-  // Función actualizada para procesar reserva
+  // ACTUALIZADO: Función procesarReserva con payload correcto para Laravel
   const procesarReserva = async () => {
     if (!fechaInicioDate || !fechaFinDate || !horaInicio || !horaFin) {
       Alert.alert(
@@ -251,7 +297,6 @@ export default function PlantillaReservacion() {
       horaInicio.getHours(),
       horaInicio.getMinutes()
     );
-    
     const fin = new Date(
       fechaFinDate.getFullYear(),
       fechaFinDate.getMonth(),
@@ -270,29 +315,30 @@ export default function PlantillaReservacion() {
 
     const habitacionSeleccionadaData = habitacionesDisponibles.find(h => h.id === habitacionSeleccionada);
 
-    // PAYLOAD CORREGIDO
-    const payload = {
-      tipo_lugar: tipoLugar,
-      id_lugar: datosLugar.id,
-      fecha_reserva: formatearFechaAPI(fechaInicioDate), // Solo fecha, sin hora
-      cantidad_personas: cantidadPersonas,
-      sub_total: subTotal,
-      costo_servicio: costoServicio,
-      fecha_inicio: formatearFechaAPI(fechaInicioDate, horaInicio),
-      fecha_fin: formatearFechaAPI(fechaFinDate, horaFin),
-      // CAMBIO IMPORTANTE: mapear tipo de habitación a valores válidos
-      tipo_habitacion: tipoLugar === "hotel" && habitacionSeleccionadaData 
-        ? mapearTipoHabitacion(habitacionSeleccionadaData.tipo) 
-        : null,
-      id_habitacion: tipoLugar === "hotel" ? habitacionSeleccionada : null,
-      noches: tipoLugar === 'hotel' ? noches : null,
-      // NO enviar Id_Cli5 - el backend lo setea automáticamente
-    };
-
-    console.log('📤 Payload corregido:', payload);
-    
-    setLoading(true);
+    // PAYLOAD ACTUALIZADO para coincidir exactamente con la API de Laravel
     try {
+      const userId = await AsyncStorage.getItem('userId');
+      
+      const payload = {
+        tipo_lugar: tipoLugar,
+        id_lugar: datosLugar.id,
+        fecha_reserva: formatearFechaAPI(fechaInicioDate, horaInicio),
+        cantidad_personas: cantidadPersonas,
+        sub_total: subTotal,
+        costo_servicio: costoServicio,
+        fecha_inicio: formatearFechaAPI(fechaInicioDate, horaInicio),
+        fecha_fin: formatearFechaAPI(fechaFinDate, horaFin),
+        // Campos específicos para hoteles
+        ...(tipoLugar === "hotel" && {
+          tipo_habitacion: habitacionSeleccionadaData?.tipo,
+          id_habitacion: habitacionSeleccionada,
+        }),
+        // IMPORTANTE: Id_Cli5 requerido por el controlador Laravel
+        Id_Cli5: userId,
+      };
+
+      setLoading(true);
+      
       const reservaCreada = await crearReserva(payload);
       
       const habitacionInfo = habitacionSeleccionadaData 
@@ -312,27 +358,8 @@ export default function PlantillaReservacion() {
         [{ text: "OK", onPress: () => navigation.goBack() }]
       );
     } catch (error) {
-      console.error('❌ Error completo:', error);
-      console.error('❌ Response data:', error.response?.data);
-      
-      // Mostrar errores específicos de validación
-      let errorMessage = "No se pudo crear la reserva.";
-      
-      if (error.response?.data) {
-        const serverError = error.response.data;
-        
-        if (serverError.errors) {
-          // Errores de validación de Laravel
-          const validationErrors = Object.values(serverError.errors).flat();
-          errorMessage = validationErrors.join('\n');
-        } else if (serverError.message) {
-          errorMessage = serverError.message;
-        } else if (serverError.error) {
-          errorMessage = serverError.error;
-        }
-      }
-      
-      Alert.alert("Error de Reserva", errorMessage);
+      console.error('Error completo:', error);
+      Alert.alert("Error", error.message || "No se pudo crear la reserva.");
     } finally {
       setLoading(false);
     }
@@ -443,16 +470,17 @@ export default function PlantillaReservacion() {
           </View>
         </View>
 
-        {/* Información de huéspedes */}
+        {/* ACTUALIZADO: Información de huéspedes */}
         <View style={tw`bg-white rounded-2xl p-5 mb-6 shadow-md`}>
           <Text style={tw`text-lg font-bold text-[#101C5D] mb-4`}>
             <Ionicons name="people-outline" size={20} color="#101C5D" /> Información de huéspedes
           </Text>
           <Text style={tw`text-[#569298] text-sm mb-4`}>
-            Esta información es solo para que el {tipoLugar} pueda preparar los servicios adecuados.
             {tipoLugar === 'hotel' 
-              ? ' El precio se calcula por habitación y número de noches.' 
-              : ' El precio es fijo por reserva.'
+              ? 'Esta información es solo informativa. El precio se calcula por habitación y número de noches.'
+              : tipoLugar === 'restaurante'
+              ? 'El precio se calcula por persona. Selecciona el número de comensales.'
+              : 'El precio se calcula por persona. Selecciona el número de visitantes.'
             }
           </Text>
           
@@ -460,7 +488,8 @@ export default function PlantillaReservacion() {
             <View style={tw`flex-row items-center justify-between`}>
               <TouchableOpacity
                 onPress={() => cantidadPersonas > 1 && setCantidadPersonas(cantidadPersonas - 1)}
-                style={tw`bg-[#569298] p-3 rounded-xl`}
+                style={tw`bg-[#569298] p-3 rounded-xl ${cantidadPersonas <= 1 ? 'opacity-50' : ''}`}
+                disabled={cantidadPersonas <= 1}
               >
                 <Ionicons name="remove" size={20} color="white" />
               </TouchableOpacity>
@@ -468,7 +497,12 @@ export default function PlantillaReservacion() {
               <View style={tw`items-center`}>
                 <Text style={tw`text-3xl font-bold text-[#101C5D]`}>{cantidadPersonas}</Text>
                 <Text style={tw`text-[#333333] text-sm`}>
-                  {cantidadPersonas === 1 ? 'persona' : 'personas'}
+                  {tipoLugar === 'restaurante' 
+                    ? (cantidadPersonas === 1 ? 'comensal' : 'comensales')
+                    : tipoLugar === 'sitio_turistico'
+                    ? (cantidadPersonas === 1 ? 'visitante' : 'visitantes')
+                    : (cantidadPersonas === 1 ? 'persona' : 'personas')
+                  }
                 </Text>
               </View>
               
@@ -488,6 +522,7 @@ export default function PlantillaReservacion() {
             <Text style={tw`text-lg font-bold text-[#101C5D]`}>
               <Ionicons name="calendar-outline" size={20} color="#101C5D" /> Fechas y horarios
             </Text>
+            {/* Mostrar número de noches calculado */}
             {tipoLugar === 'hotel' && noches > 0 && (
               <View style={tw`bg-[#D4AF37]/10 px-3 py-1 rounded-full border border-[#D4AF37]/30`}>
                 <Text style={tw`text-[#D4AF37] font-bold text-sm`}>
@@ -602,13 +637,14 @@ export default function PlantillaReservacion() {
           </View>
         )}
 
-        {/* Resumen de la reserva */}
+        {/* ACTUALIZADO: Resumen de la reserva */}
         <View style={tw`bg-white rounded-2xl p-5 mb-6 shadow-md`}>
           <Text style={tw`text-lg font-bold text-[#101C5D] mb-4`}>
             <Ionicons name="receipt-outline" size={20} color="#101C5D" /> Resumen de la reserva
           </Text>
           
           <View style={tw`space-y-3`}>
+            {/* Mostrar desglose para hoteles */}
             {tipoLugar === 'hotel' && habitacionSeleccionadaData && noches > 0 && (
               <>
                 <View style={tw`flex-row justify-between items-center pb-3 border-b border-[#F5F5F5]`}>
@@ -622,6 +658,26 @@ export default function PlantillaReservacion() {
                   <Text style={tw`font-bold text-[#101C5D]`}>${(precioPorNoche * noches).toFixed(2)}</Text>
                 </View>
               </>
+            )}
+
+            {/* Mostrar desglose para restaurantes */}
+            {tipoLugar === 'restaurante' && (
+              <View style={tw`flex-row justify-between items-center pb-3 border-b border-[#F5F5F5]`}>
+                <Text style={tw`text-[#333333] font-medium`}>
+                  {cantidadPersonas} {cantidadPersonas === 1 ? 'comensal' : 'comensales'} × ${(datosCompletos?.Precio_Rest || datosLugar.Precio_Rest || 25)}
+                </Text>
+                <Text style={tw`font-bold text-[#101C5D]`}>${precioPorNoche.toFixed(2)}</Text>
+              </View>
+            )}
+
+            {/* Mostrar desglose para sitios turísticos */}
+            {tipoLugar === 'sitio_turistico' && (
+              <View style={tw`flex-row justify-between items-center pb-3 border-b border-[#F5F5F5]`}>
+                <Text style={tw`text-[#333333] font-medium`}>
+                  {cantidadPersonas} {cantidadPersonas === 1 ? 'visitante' : 'visitantes'} × ${(datosCompletos?.Precio_Siti || datosLugar.Precio_Siti || 15)}
+                </Text>
+                <Text style={tw`font-bold text-[#101C5D]`}>${precioPorNoche.toFixed(2)}</Text>
+              </View>
             )}
             
             <View style={tw`flex-row justify-between items-center`}>
@@ -646,7 +702,7 @@ export default function PlantillaReservacion() {
             <Text style={tw`text-[#569298] text-sm text-center mt-2`}>
               {tipoLugar === 'hotel' 
                 ? '💡 Precio calculado por habitación y número de noches' 
-                : '💡 Precio fijo por reserva, sin importar el número de huéspedes'
+                : '💡 Precio calculado por persona'
               }
             </Text>
           </View>

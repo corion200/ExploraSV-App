@@ -3,7 +3,9 @@ import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { cancelarReserva } from '../../api/reservas';
 import tw from '../tw';
+import BottomNavBar from './nav';
 
 export default function DetalleReserva({ route, navigation }) {
   const { reserva } = route.params;
@@ -56,7 +58,7 @@ export default function DetalleReserva({ route, navigation }) {
     }
   };
 
-  const handleCancelar = () => {
+  const handleCancelar = async () => {
     if (estado?.toLowerCase() === 'cancelada') {
       Alert.alert('Reserva ya cancelada', 'Esta reserva ya fue cancelada anteriormente.');
       return;
@@ -70,10 +72,17 @@ export default function DetalleReserva({ route, navigation }) {
         { 
           text: 'Sí, Cancelar', 
           style: 'destructive',
-          onPress: () => {
-            // Aquí implementarías la lógica de cancelación
-            Alert.alert('Reserva cancelada', 'Tu reserva ha sido cancelada exitosamente.');
-            navigation.goBack();
+          onPress: async () => {
+            try {
+              await cancelarReserva(reservaId);
+              Alert.alert(
+                'Reserva cancelada', 
+                'Tu reserva ha sido cancelada exitosamente.',
+                [{ text: 'OK', onPress: () => navigation.goBack() }]
+              );
+            } catch (error) {
+              Alert.alert('Error', error.message || 'No se pudo cancelar la reserva');
+            }
           }
         }
       ]
@@ -88,12 +97,6 @@ export default function DetalleReserva({ route, navigation }) {
         style={tw`px-6 py-4 rounded-b-3xl`}
       >
         <View style={tw`flex-row items-center justify-between`}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()}
-            style={tw`bg-white/20 p-3 rounded-xl`}
-          >
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
           <Text style={tw`text-white text-xl font-bold flex-1 text-center mx-4`}>
             Detalle de Reserva
           </Text>
@@ -101,7 +104,12 @@ export default function DetalleReserva({ route, navigation }) {
         </View>
       </LinearGradient>
 
-      <ScrollView style={tw`flex-1 px-6 py-4`} showsVerticalScrollIndicator={false}>
+      {/* ✅ CONTENIDO CON PADDING BOTTOM PARA EL NAV */}
+      <ScrollView 
+        style={tw`flex-1 px-6 py-4`} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={tw`pb-32`} // ✅ AGREGAR PADDING BOTTOM
+      >
         {/* Información principal */}
         <View style={tw`bg-white rounded-3xl p-6 mb-6 shadow-lg`}>
           <View style={tw`flex-row justify-between items-start mb-4`}>
@@ -243,7 +251,10 @@ export default function DetalleReserva({ route, navigation }) {
               </Text>
             </View>
           </TouchableOpacity>
+
         )}
+
+        
       </ScrollView>
     </SafeAreaView>
   );
