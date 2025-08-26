@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './api';
 
-export async function login(Correo_Cli, Contra_Cli, navigation,Id_Cli) {
+export async function login(Correo_Cli, Contra_Cli, navigation, Id_Cli) {
   try {
     const response = await api.post('login', {
       Correo_Cli,
@@ -12,9 +12,10 @@ export async function login(Correo_Cli, Contra_Cli, navigation,Id_Cli) {
     const { token, Turista } = response.data;
 
     if (token && Turista) {
-      // Guarda el usuario completo tal cual viene
+      // Guarda token y usuario
+      await AsyncStorage.setItem('authToken', token);
       await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
-    
+
       console.log('Toru dio la bienvenida a:', Turista.Nom_Cli);
     
       if (navigation && typeof navigation.reset === 'function') {
@@ -36,7 +37,6 @@ export async function login(Correo_Cli, Contra_Cli, navigation,Id_Cli) {
     return null;
   }
 }
-
 export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confirmation) {
   await AsyncStorage.removeItem('Turista');
   try {
@@ -82,22 +82,6 @@ export async function getCurrentUser() {
   }
 }
 
-// Cerrar sesión
-export async function logout(navigation) {
-  try {
-    await AsyncStorage.removeItem('Turista');
-    console.log('Sesión cerrada correctamente');
-
-    if (navigation && typeof navigation.reset === 'function') {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }
-  } catch (error) {
-    console.log('Error al cerrar sesión:', error.message);
-  }
-}
 
 // Editar perfil
 export async function updateProfile(userData) {

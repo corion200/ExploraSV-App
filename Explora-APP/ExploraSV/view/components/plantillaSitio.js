@@ -7,7 +7,7 @@ import Comentario from "./reviewSitio";
 const screenWidth = Dimensions.get('window').width;
 
 // Cambia esta IP y puerto a los de tu backend local
-const BASE_URL = "http://192.168.0.13:8000/";
+const BASE_URL = "http://192.168.1.17:8000/";
 
 const transformarDatosSitio = (datosRaw) => {
   console.log('=== TRANSFORMANDO DATOS ===');

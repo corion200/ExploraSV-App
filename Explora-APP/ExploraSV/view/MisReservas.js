@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  RefreshControl,
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  TouchableOpacity, 
   ActivityIndicator,
+  RefreshControl,
+  Alert,
+  Image 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import tw from './tw';
-import BottomNavBar from './components/nav';
-import api from '../api';
+import { obtenerMisReservas } from './../api/reservas';
 
 export default function MisReservas({ navigation }) {
+  // ✅ SOLUCIÓN: Inicializar como array vacío
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
   const colors = {
     primary: '#101C5D',
@@ -29,106 +31,231 @@ export default function MisReservas({ navigation }) {
     vibrant: '#F97C7C',
   };
 
-  const obtenerReservas = async () => {
+  useEffect(() => {
+    cargarReservas();
+  }, []);
+
+  const cargarReservas = async () => {
     try {
-      const response = await api.get('/mis-reservas');
-      setReservas(response.data);
-    } catch (error) {
-      console.error('Error al obtener reservas:', error);
-      Alert.alert('Error', 'No se pudieron cargar las reservas');
+      setLoading(true);
+      setError(null);
+      
+      const response = await obtenerMisReservas();
+      console.log('📦 Respuesta API misReservas:', response);
+      
+      // ✅ IMPORTANTE: Verificar la estructura de la respuesta
+      if (response && response.success && Array.isArray(response.reservas)) {
+        setReservas(response.reservas);
+        console.log('✅ Reservas cargadas:', response.reservas.length);
+      } else if (response && Array.isArray(response)) {
+        // Si la API devuelve directamente un array
+        setReservas(response);
+      } else {
+        console.warn('⚠️ Formato de respuesta inesperado:', response);
+        setReservas([]); // Mantener como array vacío
+        setError('No se pudieron cargar las reservas');
+      }
+    } catch (err) {
+      console.error('❌ Error cargando reservas:', err);
+      setError(err.message || 'Error al cargar reservas');
+      setReservas([]); // ✅ Mantener como array vacío en caso de error
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
-  useEffect(() => {
-    obtenerReservas();
-  }, []);
-
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    obtenerReservas();
+    await cargarReservas();
+    setRefreshing(false);
   };
 
-  const cancelarReserva = async (reservaId) => {
-    Alert.alert(
-      'Cancelar Reserva',
-      '¿Estás seguro de que quieres cancelar esta reserva?',
-      [
-        { text: 'No', style: 'cancel' },
-        {
-          text: 'Sí, cancelar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.patch(`/cancelar-reserva/${reservaId}`);
-              Alert.alert('Éxito', 'Reserva cancelada correctamente');
-              obtenerReservas(); // Recargar lista
-            } catch (error) {
-              Alert.alert('Error', 'No se pudo cancelar la reserva');
-            }
-          },
-        },
-      ]
-    );
+  const formatearFecha = (fecha) => {
+    if (!fecha) return 'Fecha no disponible';
+    try {
+      return new Date(fecha).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return fecha; // Devolver fecha original si no se puede formatear
+    }
   };
 
   const getEstadoColor = (estado) => {
     switch (estado?.toLowerCase()) {
       case 'confirmada':
+      case 'confirmado':
         return colors.secondary;
       case 'pendiente':
         return colors.complementary;
       case 'cancelada':
+      case 'cancelado':
         return colors.vibrant;
       default:
         return colors.neutralDark;
     }
   };
 
-  const getEstadoIcon = (estado) => {
-    switch (estado?.toLowerCase()) {
-      case 'confirmada':
-        return 'checkmark-circle';
-      case 'pendiente':
-        return 'time';
-      case 'cancelada':
-        return 'close-circle';
-      default:
-        return 'help-circle';
-    }
+  const renderReservaItem = ({ item }) => {
+    // ✅ Usar tanto formato nuevo como legacy para compatibilidad
+    const reservaId = item.id || item.Id_Rese;
+    const fechaReserva = item.fecha_reserva || item.Fec_Rese;
+    const estado = item.estado || item.Est_Rese;
+    const cantidadPersonas = item.cantidad_personas || item.Canti_Person;
+    const subtotal = item.subtotal || item.SubT_Reservas;
+    const lugar = item.lugar;
+    const tipoLugar = item.tipo_lugar;
+
+    return (
+      <TouchableOpacity
+        style={tw`bg-white rounded-2xl p-5 mb-4 mx-4 shadow-lg border border-gray-100`}
+        onPress={() => navigation.navigate('DetalleReserva', { reserva: item })}
+        activeOpacity={0.7}
+      >
+        <View style={tw`flex-row justify-between items-start mb-3`}>
+          <View style={tw`flex-1`}>
+            <Text style={[tw`text-xl font-bold mb-1`, { color: colors.primary }]}>
+              Reserva #{reservaId}
+            </Text>
+            <View style={tw`flex-row items-center mb-2`}>
+              <View 
+                style={[
+                  tw`px-3 py-1 rounded-full`,
+                  { backgroundColor: getEstadoColor(estado) + '20' }
+                ]}
+              >
+                <Text 
+                  style={[
+                    tw`text-sm font-semibold capitalize`,
+                    { color: getEstadoColor(estado) }
+                  ]}
+                >
+                  {estado || 'Sin estado'}
+                </Text>
+              </View>
+            </View>
+          </View>
+          
+          {lugar?.imagen && (
+            <Image
+              source={{ uri: lugar.imagen }}
+              style={tw`w-16 h-16 rounded-xl`}
+              resizeMode="cover"
+            />
+          )}
+        </View>
+
+        <View style={tw`space-y-2`}>
+          {lugar && (
+            <View style={tw`flex-row items-center`}>
+              <Ionicons 
+                name={tipoLugar === 'hotel' ? 'bed' : tipoLugar === 'restaurante' ? 'restaurant' : 'location'} 
+                size={16} 
+                color={colors.secondary} 
+              />
+              <Text style={[tw`ml-2 font-medium flex-1`, { color: colors.neutralDark }]}>
+                {lugar.nombre || 'Lugar no especificado'}
+              </Text>
+            </View>
+          )}
+
+          <View style={tw`flex-row items-center`}>
+            <Ionicons name="calendar" size={16} color={colors.secondary} />
+            <Text style={[tw`ml-2`, { color: colors.neutralDark }]}>
+              {formatearFecha(fechaReserva)}
+            </Text>
+          </View>
+
+          <View style={tw`flex-row items-center justify-between mt-3`}>
+            <View style={tw`flex-row items-center`}>
+              <Ionicons name="people" size={16} color={colors.complementary} />
+              <Text style={[tw`ml-2 font-medium`, { color: colors.neutralDark }]}>
+                {cantidadPersonas || 0} {(cantidadPersonas || 0) === 1 ? 'persona' : 'personas'}
+              </Text>
+            </View>
+
+            {subtotal && (
+              <Text style={[tw`text-lg font-bold`, { color: colors.complementary }]}>
+                ${parseFloat(subtotal).toFixed(2)}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        <View style={tw`flex-row justify-end mt-3`}>
+          <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
+        </View>
+      </TouchableOpacity>
+    );
   };
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return 'No disponible';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const getTipoIcon = (tipo) => {
-    switch (tipo) {
-      case 'hotel':
-        return 'bed';
-      case 'restaurante':
-        return 'restaurant';
-      case 'sitio_turistico':
-        return 'location';
-      default:
-        return 'map';
-    }
-  };
-
+  // ✅ Mostrar loading
   if (loading) {
     return (
-      <SafeAreaView style={[tw`flex-1 justify-center items-center`, { backgroundColor: colors.neutralLight }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={[tw`mt-4 text-base`, { color: colors.neutralDark }]}>
-          Cargando reservas...
-        </Text>
+      <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
+        <LinearGradient
+          colors={[colors.primary, colors.secondary]}
+          style={tw`px-6 py-4 rounded-b-3xl`}
+        >
+          <Text style={tw`text-white text-2xl font-bold text-center`}>
+            Mis Reservas
+          </Text>
+        </LinearGradient>
+        
+        <View style={tw`flex-1 justify-center items-center`}>
+          <ActivityIndicator size="large" color={colors.secondary} />
+          <Text style={[tw`mt-4 text-lg`, { color: colors.neutralDark }]}>
+            Cargando reservas...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ✅ Mostrar error
+  if (error) {
+    return (
+      <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
+        <LinearGradient
+          colors={[colors.primary, colors.secondary]}
+          style={tw`px-6 py-4 rounded-b-3xl`}
+        >
+          <Text style={tw`text-white text-2xl font-bold text-center`}>
+            Mis Reservas
+          </Text>
+        </LinearGradient>
+        
+        <View style={tw`flex-1 justify-center items-center px-6`}>
+          <Ionicons name="alert-circle-outline" size={64} color={colors.vibrant} />
+          <Text style={[tw`text-xl font-bold mt-4 text-center`, { color: colors.neutralDark }]}>
+            Error al cargar reservas
+          </Text>
+          <Text style={[tw`text-base mt-2 text-center`, { color: colors.neutralDark }]}>
+            {error}
+          </Text>
+          <TouchableOpacity
+            onPress={cargarReservas}
+            style={[tw`mt-6 px-6 py-3 rounded-xl`, { backgroundColor: colors.secondary }]}
+          >
+            <Text style={tw`text-white font-semibold text-lg`}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ✅ Verificación adicional antes de renderizar (por si acaso)
+  if (!Array.isArray(reservas)) {
+    console.warn('⚠️ reservas no es un array:', reservas);
+    return (
+      <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
+        <View style={tw`flex-1 justify-center items-center`}>
+          <Text style={[tw`text-lg`, { color: colors.neutralDark }]}>
+            Error en el formato de datos
+          </Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -136,172 +263,75 @@ export default function MisReservas({ navigation }) {
   return (
     <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
       {/* Header */}
-      <View style={[tw`px-6 py-4 flex-row items-center justify-between`, { backgroundColor: 'white' }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={colors.primary} />
-        </TouchableOpacity>
-        
-        <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>
-          Mis Reservas
-        </Text>
-        
-        <TouchableOpacity onPress={onRefresh}>
-          <Ionicons name="refresh" size={24} color={colors.secondary} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        style={tw`flex-1`}
-        contentContainerStyle={tw`px-6 py-4 pb-24`}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
+      <LinearGradient
+        colors={[colors.primary, colors.secondary]}
+        style={tw`px-6 py-4 rounded-b-3xl mb-4`}
       >
-        {reservas.length === 0 ? (
-          <View style={tw`flex-1 justify-center items-center mt-20`}>
-            <Ionicons name="calendar-outline" size={80} color={colors.neutralDark} />
-            <Text style={[tw`text-lg font-bold mt-4 mb-2`, { color: colors.neutralDark }]}>
-              No tienes reservas
-            </Text>
-            <Text style={[tw`text-center text-base mb-8`, { color: colors.neutralDark }]}>
-              ¡Explora lugares increíbles y haz tu primera reserva!
-            </Text>
-            
-            <TouchableOpacity
-              style={[tw`px-8 py-3 rounded-xl flex-row items-center`, { backgroundColor: colors.complementary }]}
-              onPress={() => navigation.navigate('Search')}
-            >
-              <Ionicons name="search" size={20} color="white" style={tw`mr-2`} />
-              <Text style={tw`text-white font-bold text-base`}>
-                Buscar Lugares
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          reservas.map((reserva, index) => (
-            <View
-              key={reserva.id || index}
-              style={[
-                tw`bg-white rounded-2xl p-4 mb-4 shadow-sm`,
-                { borderLeftWidth: 4, borderLeftColor: getEstadoColor(reserva.Est_Rese) }
-              ]}
-            >
-              {/* Header de la reserva */}
-              <View style={tw`flex-row justify-between items-start mb-3`}>
-                <View style={tw`flex-1`}>
-                  <Text style={[tw`text-lg font-bold mb-1`, { color: colors.primary }]}>
-                    {reserva.nombre_lugar || `Reserva #${reserva.id}`}
-                  </Text>
-                  
-                  <View style={tw`flex-row items-center`}>
-                    <Ionicons
-                      name={getTipoIcon(reserva.tipo_lugar)}
-                      size={16}
-                      color={colors.complementary}
-                      style={tw`mr-2`}
-                    />
-                    <Text style={[tw`text-sm`, { color: colors.neutralDark }]}>
-                      {reserva.tipo_lugar === 'hotel' ? 'Hotel' : 
-                       reserva.tipo_lugar === 'restaurante' ? 'Restaurante' : 'Sitio Turístico'}
-                    </Text>
-                  </View>
-                </View>
+        <View style={tw`flex-row items-center justify-between`}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={tw`bg-white/20 p-3 rounded-xl`}
+          >
+            <Ionicons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          
+          <Text style={tw`text-white text-2xl font-bold flex-1 text-center mx-4`}>
+            Mis Reservas
+          </Text>
+          
+          <TouchableOpacity
+            onPress={cargarReservas}
+            style={tw`bg-white/20 p-3 rounded-xl`}
+          >
+            <Ionicons name="refresh" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-                <View style={tw`items-end`}>
-                  <View style={tw`flex-row items-center mb-1`}>
-                    <Ionicons
-                      name={getEstadoIcon(reserva.Est_Rese)}
-                      size={16}
-                      color={getEstadoColor(reserva.Est_Rese)}
-                      style={tw`mr-1`}
-                    />
-                    <Text style={[tw`text-sm font-bold`, { color: getEstadoColor(reserva.Est_Rese) }]}>
-                      {reserva.Est_Rese || 'Pendiente'}
-                    </Text>
-                  </View>
-                  <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>
-                    ID: {reserva.id}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Detalles de la reserva */}
-              <View style={tw`bg-gray-50 rounded-xl p-3 mb-3`}>
-                <View style={tw`flex-row justify-between mb-2`}>
-                  <View style={tw`flex-1`}>
-                    <Text style={[tw`text-xs font-medium`, { color: colors.neutralDark }]}>
-                      Fecha de reserva
-                    </Text>
-                    <Text style={[tw`text-sm font-bold`, { color: colors.primary }]}>
-                      {formatearFecha(reserva.Fec_Rese)}
-                    </Text>
-                  </View>
-                  
-                  <View style={tw`flex-1 items-end`}>
-                    <Text style={[tw`text-xs font-medium`, { color: colors.neutralDark }]}>
-                      Personas
-                    </Text>
-                    <Text style={[tw`text-sm font-bold`, { color: colors.primary }]}>
-                      {reserva.cantidad_personas || 'N/A'}
-                    </Text>
-                  </View>
-                </View>
-
-                {reserva.fecha_inicio && (
-                  <View style={tw`flex-row justify-between`}>
-                    <View style={tw`flex-1`}>
-                      <Text style={[tw`text-xs font-medium`, { color: colors.neutralDark }]}>
-                        Inicio
-                      </Text>
-                      <Text style={[tw`text-sm`, { color: colors.neutralDark }]}>
-                        {formatearFecha(reserva.fecha_inicio)}
-                      </Text>
-                    </View>
-                    
-                    {reserva.fecha_fin && (
-                      <View style={tw`flex-1 items-end`}>
-                        <Text style={[tw`text-xs font-medium`, { color: colors.neutralDark }]}>
-                          Fin
-                        </Text>
-                        <Text style={[tw`text-sm`, { color: colors.neutralDark }]}>
-                          {formatearFecha(reserva.fecha_fin)}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-              </View>
-
-              {/* Botones de acción */}
-              <View style={tw`flex-row justify-between`}>
-                <TouchableOpacity
-                  style={[tw`flex-1 py-2 px-4 rounded-lg mr-2 flex-row items-center justify-center`, { backgroundColor: colors.secondary }]}
-                  onPress={() => {
-                    // Navegar a detalle de la reserva o al lugar
-                    navigation.navigate('DetalleReserva', { reserva });
-                  }}
-                >
-                  <Ionicons name="eye" size={16} color="white" style={tw`mr-2`} />
-                  <Text style={tw`text-white font-medium text-sm`}>Ver Detalle</Text>
-                </TouchableOpacity>
-
-                {reserva.Est_Rese !== 'cancelada' && (
-                  <TouchableOpacity
-                    style={[tw`flex-1 py-2 px-4 rounded-lg ml-2 flex-row items-center justify-center`, { backgroundColor: colors.vibrant }]}
-                    onPress={() => cancelarReserva(reserva.id)}
-                  >
-                    <Ionicons name="close" size={16} color="white" style={tw`mr-2`} />
-                    <Text style={tw`text-white font-medium text-sm`}>Cancelar</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          ))
-        )}
-      </ScrollView>
-
-      <BottomNavBar />
+      {/* Lista de reservas */}
+      {reservas.length === 0 ? (
+        <View style={tw`flex-1 justify-center items-center px-6`}>
+          <Ionicons name="calendar-outline" size={64} color={colors.secondary} />
+          <Text style={[tw`text-xl font-bold mt-4 text-center`, { color: colors.neutralDark }]}>
+            No tienes reservas
+          </Text>
+          <Text style={[tw`text-base mt-2 text-center`, { color: colors.neutralDark }]}>
+            Cuando hagas una reserva, aparecerá aquí
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Home')}
+            style={[tw`mt-6 px-6 py-3 rounded-xl`, { backgroundColor: colors.secondary }]}
+          >
+            <Text style={tw`text-white font-semibold text-lg`}>Explorar lugares</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={reservas}
+          keyExtractor={(item) => (item.id || item.Id_Rese)?.toString() || Math.random().toString()}
+          renderItem={renderReservaItem}
+          contentContainerStyle={tw`pb-6`}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.secondary]}
+              tintColor={colors.secondary}
+            />
+          }
+          // ✅ Props de optimización
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          initialNumToRender={5}
+          getItemLayout={(data, index) => ({
+            length: 180, // Altura aproximada de cada item
+            offset: 180 * index,
+            index,
+          })}
+        />
+      )}
     </SafeAreaView>
   );
 }

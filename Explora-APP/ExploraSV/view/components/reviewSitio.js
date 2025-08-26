@@ -58,7 +58,9 @@ export default function Comentario({ Id_Siti, tipo}) {
       const response = await api.get(`/lugares/${tipoLugar}/${Id_Siti}/reviews`);
       setResenas(response.data);
     } catch (error) {
-      console.error('Error al obtener reseñas:', error);
+      console.error('Error al obtener reseñas:', error?.response?.data || error.message);
+      // En caso de error (no hay reseñas), establecemos array vacío
+      setResenas([]);
     }
   };
 
@@ -180,7 +182,7 @@ export default function Comentario({ Id_Siti, tipo}) {
       <FlatList
         ListHeaderComponent={
           <View>
-            <Text style={tw`text-base font-bold mb-4`}>Reseñas</Text>
+            <Text style={tw`text-base text-[#101C5D] font-bold mb-4`}>Reseñas</Text>
             {userData ? (
               <>
                 <TextInput
