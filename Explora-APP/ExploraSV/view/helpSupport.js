@@ -52,7 +52,7 @@ const HelpSupport = ({ navigation }) => {
       Toast.show({
         type: 'error',
         text1: '🐦 ¡Faltan datos!',
-        text2: 'Toru necesita que completes todos los campos.',
+        text2: 'Tori necesita que completes todos los campos.',
       });
       return;
     }
@@ -65,7 +65,7 @@ const HelpSupport = ({ navigation }) => {
     Toast.show({
       type: 'success',
       text1: '🐦 ¡Reporte enviado!',
-      text2: 'Toru ha recibido tu reporte. Te responderemos pronto.',
+      text2: 'Tori ha recibido tu reporte. Te responderemos pronto.',
     });
 
     // Limpiar y cerrar
@@ -171,7 +171,7 @@ const HelpSupport = ({ navigation }) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Mensaje de Toru */}
+        {/* Mensaje de Tori */}
         <View style={{
           backgroundColor: COLORS.white,
           marginHorizontal: 20,
@@ -187,7 +187,7 @@ const HelpSupport = ({ navigation }) => {
             color: COLORS.primary,
             marginBottom: 8,
           }}>
-            🐦 ¡Hola! Soy Toru, tu asistente de viajes
+            🐦 ¡Hola! Soy Tori, tu asistente de viajes
           </Text>
           <Text style={{
             fontSize: 14,
@@ -212,7 +212,7 @@ const HelpSupport = ({ navigation }) => {
 
         <MenuCard
           icon="🐦"
-          title="Chat con Toru"
+          title="Chat con Tori"
           subtitle="Chatea conmigo para resolver dudas rápidas"
           onPress={() => {chatbotApi(); navigation.navigate('ChatScreen');}}
           color={COLORS.gold}
@@ -325,7 +325,7 @@ const HelpSupport = ({ navigation }) => {
             </View>
 
             <ScrollView>
-              {/* Mensaje de Toru */}
+              {/* Mensaje de Tori */}
               <View style={{
                 backgroundColor: COLORS.lightGray,
                 padding: 15,
@@ -339,7 +339,7 @@ const HelpSupport = ({ navigation }) => {
                   fontWeight: 'bold',
                   fontSize: 14,
                 }}>
-                  🐦 ¡Cuéntale a Toru qué pasó!
+                  🐦 ¡Cuéntale a Tori qué pasó!
                 </Text>
                 <Text style={{
                   color: COLORS.darkGray,
@@ -527,7 +527,7 @@ const HelpSupport = ({ navigation }) => {
                   fontWeight: 'bold',
                   fontSize: 14,
                 }}>
-                  🐦 ¡Hola! Toru te explica
+                  🐦 ¡Hola! Tori te explica
                 </Text>
                 <Text style={{
                   color: COLORS.darkGray,
@@ -647,7 +647,7 @@ const HelpSupport = ({ navigation }) => {
                 Si tienes preguntas, contáctanos:{'\n'}
                 📧 soporte@tuapp.com{'\n'}
                 📱 +52 123 456 7890{'\n'}
-                🐦 Chat con Toru en la app
+                🐦 Chat con Tori en la app
               </Text>
             </ScrollView>
           </SafeAreaView>

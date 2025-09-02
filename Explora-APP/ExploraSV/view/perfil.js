@@ -27,9 +27,6 @@ const ConfiguracionesScreen = () => {
 
   const menuItems = [
     { title: 'Mis Reservas', icon: 'calendar-outline', screen: 'MisReservas', color: colors.complementary },
-    { title: 'Tus favoritos', icon: 'heart-outline', screen: 'Favoritos', color: colors.vibrant },
-    { title: 'Puntos acumulados', icon: 'trophy-outline', screen: 'Puntos', color: colors.secondary },
-    { title: 'Configuraciones', icon: 'settings-outline', screen: 'Settings', color: colors.neutralDark },
     { title: 'Ayuda y soporte', icon: 'help-circle-outline', screen: 'HelpSupport', color: colors.secondary },
     { title: 'Cerrar Sesión', icon: 'exit-outline', isLogout: true, color: colors.vibrant },
   ];
@@ -254,38 +251,7 @@ const ConfiguracionesScreen = () => {
         </View>
 
         {/* Estadísticas rápidas */}
-        <View style={tw`px-6 -mt-6 mb-6`}>
-          <View style={tw`bg-white rounded-2xl p-4 shadow-lg`}>
-            <Text style={[tw`text-lg font-bold mb-4`, { color: colors.primary }]}>
-              Tu actividad
-            </Text>
-            <View style={tw`flex-row justify-around`}>
-              <View style={tw`items-center`}>
-                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.secondary + '20' }]}>
-                  <Ionicons name="calendar" size={24} color={colors.secondary} />
-                </View>
-                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>5</Text>
-                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Reservas</Text>
-              </View>
-              
-              <View style={tw`items-center`}>
-                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.vibrant + '20' }]}>
-                  <Ionicons name="heart" size={24} color={colors.vibrant} />
-                </View>
-                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>12</Text>
-                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Favoritos</Text>
-              </View>
-              
-              <View style={tw`items-center`}>
-                <View style={[tw`w-12 h-12 rounded-full items-center justify-center mb-2`, { backgroundColor: colors.complementary + '20' }]}>
-                  <Ionicons name="trophy" size={24} color={colors.complementary} />
-                </View>
-                <Text style={[tw`text-xl font-bold`, { color: colors.primary }]}>850</Text>
-                <Text style={[tw`text-xs`, { color: colors.neutralDark }]}>Puntos</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        
 
         {/* Lista de opciones mejorada */}
         <View style={tw`px-6 pb-6`}>

@@ -6,6 +6,7 @@ import SignUp from './signUp';
 import Index from './indexScreen';
 import Login from './login';
 import Site from './site';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import ChatScreen from './components/chatbot/ChatScreen';
 import Perfil from './perfil';
 import { ClerkProvider } from '@clerk/clerk-expo';
@@ -31,6 +32,7 @@ const Stack = createStackNavigator();
 
 export default function Navigation() {
   return (
+    <StripeProvider publishableKey="pk_test_51Pj74HH0PsqN4TntZHauBtZcGWd7KomCktxX4WzeHWuLjJdj8LEZJdCMy5myTwYsWbwp0OXuAKz6ZYRiPTAiQzWb00okrgV0EK">
 <ClerkProvider publishableKey="pk_test_Zml0dGluZy1zZWFsLTIyLmNsZXJrLmFjY291bnRzLmRldiQ" tokenCache={tokenCache}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
@@ -41,7 +43,7 @@ export default function Navigation() {
           name="ChatScreen"
           component={ChatScreen}
           options={{ 
-            headerTitle: "Toru - Asistente Turístico",
+            headerTitle: "Tori - Asistente Turístico",
             headerStyle: { backgroundColor: '#3FCFB0' },
             headerTintColor: 'white'
           }}
@@ -63,5 +65,6 @@ export default function Navigation() {
     <Toast config={toastConfig}/> 
     
     </ClerkProvider>
+    </StripeProvider>
   );
 }

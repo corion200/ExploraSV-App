@@ -24,11 +24,11 @@ export default function Site({ route, navigation }) { // ⭐ Agregar navigation
     const id = sitio.Id_Siti || sitio.id;
     
     if (sitio.tipo === 'hotel') {
-      endpoint = `http://192.168.1.17:8000/api/hoteles/${id}`;
+      endpoint = `http://192.168.1.61:8000/api/hoteles/${id}`;
     } else if (sitio.tipo === 'restaurante') {
-      endpoint = `http://192.168.1.17:8000/api/restaurantes/${id}`; // ⭐ Corregido puerto
+      endpoint = `http://192.168.1.61:8000/api/restaurantes/${id}`; // ⭐ Corregido puerto
     } else {
-      endpoint = `http://192.168.1.17:8000/api/sitios/${id}`;
+      endpoint = `http://192.168.1.61:8000/api/sitios/${id}`;
     }
 
     console.log('Endpoint calculado:', endpoint);

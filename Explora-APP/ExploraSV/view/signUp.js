@@ -22,6 +22,8 @@ const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
 
 
+  
+
 // Agrega esta función en SignUp.js, antes de handleRegister
 const validateForm = () => {
   const newErrors = {};
@@ -41,53 +43,53 @@ const validateForm = () => {
 };
 
 
-  // Validaciones individuales con personalidad de Toru
+// Validaciones individuales sin estilo infantil
 const validateName = (name) => {
   if (!name.trim()) {
-    return '🐦 ¡Hola! Toru quiere conocerte, ¿cuál es tu nombre?';
+    return 'Debe ingresar un nombre.';
   }
   if (name.trim().length < 2) {
-    return '🐦 Toru dice que tu nombre es muy cortito. ¿Puedes escribirlo completo?';
+    return 'El nombre debe tener al menos 2 caracteres.';
   }
   return null;
 };
 
 const validateEmail = (email) => {
   if (!email.trim()) {
-    return '🐦 Toru necesita tu correo para enviarte sorpresas';
+    return 'Debe ingresar un correo electrónico.';
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return '🐦 Mmm... Toru dice que ese correo se ve raro. ¿Está bien escrito?';
+    return 'El formato del correo electrónico no es válido.';
   }
   return null;
 };
 
 const validatePassword = (password) => {
   if (!password) {
-    return '🐦 ¡Oye! Toru dice que necesitas una contraseña súper secreta';
+    return 'Debe ingresar una contraseña.';
   }
   if (password.length < 8) {
-    return '🐦 Toru recomienda al menos 8 caracteres para tu contraseña';
+    return 'La contraseña debe tener al menos 8 caracteres.';
   }
   if (!/(?=.*[a-z])/.test(password)) {
-    return '🐦 Toru sugiere agregar algunas letras minúsculas';
+    return 'La contraseña debe incluir al menos una letra minúscula.';
   }
   if (!/(?=.*[A-Z])/.test(password)) {
-    return '🐦 ¡Toru quiere ver algunas MAYÚSCULAS por ahí!';
+    return 'La contraseña debe incluir al menos una letra mayúscula.';
   }
   if (!/(?=.*\d)/.test(password)) {
-    return '🐦 Toru dice: "¡No olvides algunos números!"';
+    return 'La contraseña debe incluir al menos un número.';
   }
   return null;
 };
 
 const validatePasswordConfirmation = (password, confirmation) => {
   if (!confirmation) {
-    return '🐦 Toru quiere asegurarse: ¿puedes repetir tu contraseña?';
+    return 'Debe confirmar su contraseña.';
   }
   if (password !== confirmation) {
-    return '🐦 ¡Uy! Toru notó que las contraseñas no son iguales';
+    return 'Las contraseñas no coinciden.';
   }
   return null;
 };
@@ -96,8 +98,8 @@ const handleRegister = async () => {
   if (!isLoaded) {
     return Toast.show({
       type: 'info',
-      text1: '🐦 Toru está preparando todo...',
-      text2: 'Dale un momentito para organizar tus datos.',
+      text1: 'Preparando el registro',
+      text2: 'Espere un momento mientras se organizan los datos.',
       position: 'bottom'
     });
   }
@@ -105,8 +107,8 @@ const handleRegister = async () => {
   if (!validateForm()) {
     Toast.show({
       type: 'error',
-      text1: '🐦 ¡Alto ahí!',
-      text2: 'Toru dice que faltan algunos detalles importantes.',
+      text1: 'Error de validación',
+      text2: 'Por favor complete los campos requeridos correctamente.',
       position: 'bottom'
     });
     return;
@@ -122,13 +124,18 @@ const handleRegister = async () => {
 
     await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 
-    const backendResult = await register(Nom_Cli.trim(), Correo_Cli.trim(), Contra_Cli, Contra_Cli_confirmation);
+    const backendResult = await register(
+      Nom_Cli.trim(), 
+      Correo_Cli.trim(), 
+      Contra_Cli, 
+      Contra_Cli_confirmation
+    );
     
     if (backendResult && backendResult.success === false) {
       Toast.show({
         type: 'error',
-        text1: '🐦 Toru encontró un problemita',
-        text2: backendResult.message || 'Algo no salió como esperaba.',
+        text1: 'Error en el registro',
+        text2: backendResult.message || 'Ocurrió un problema en el proceso.',
         position: 'bottom'
       });
       setIsLoading(false);
@@ -142,8 +149,8 @@ const handleRegister = async () => {
 
     Toast.show({
       type: 'success',
-      text1: '🐦 ¡Toru está súper emocionado! 🎉',
-      text2: 'Te envió un código secreto a tu correo.',
+      text1: 'Registro exitoso',
+      text2: 'Se ha enviado un código de verificación a su correo.',
       position: 'bottom'
     });
 
@@ -157,40 +164,40 @@ const handleRegister = async () => {
 
     let mensaje = error.errors?.[0]?.message || error.message || "Ocurrió un error";
 
-    // Mensajes de Toru según el tipo de error
+    // Manejo formal de errores
     if (/already in use/i.test(mensaje) || /identifier already exists/i.test(mensaje)) {
       Toast.show({
         type: 'error',
-        text1: '🐦 ¡Toru dice que ya te conoce!',
-        text2: 'Ese correo ya está registrado. ¿Quieres iniciar sesión mejor?',
+        text1: 'Correo en uso',
+        text2: 'El correo ingresado ya está registrado. Intente iniciar sesión.',
         position: 'bottom'
       });
     } else if (/password.*too.*short/i.test(mensaje) || /password.*weak/i.test(mensaje)) {
       Toast.show({
         type: 'error',
-        text1: '🐦 Toru dice: "¡Contraseña muy fácil!"',
-        text2: 'Necesitas una contraseña más fuerte con mayúsculas, números y símbolos.',
+        text1: 'Contraseña débil',
+        text2: 'La contraseña debe ser más segura, incluyendo mayúsculas, números y símbolos.',
         position: 'bottom'
       });
     } else if (/invalid.*email/i.test(mensaje) || /email.*invalid/i.test(mensaje)) {
       Toast.show({
         type: 'error',
-        text1: '🐦 Toru no entiende ese correo',
-        text2: 'Parece que el formato no está bien. ¿Puedes revisarlo?',
+        text1: 'Correo inválido',
+        text2: 'El formato del correo electrónico no es correcto.',
         position: 'bottom'
       });
     } else if (/password.*found/i.test(mensaje)) {
       Toast.show({
         type: 'error',
-        text1: '🐦 ¡Toru dice: "Esa contraseña es muy famosa!"',
-        text2: 'Es mejor usar una contraseña única que solo tú conozcas.',
+        text1: 'Contraseña insegura',
+        text2: 'La contraseña ingresada es demasiado común. Use una más segura.',
         position: 'bottom'
       });
     } else {
       Toast.show({
         type: 'error',
-        text1: '🐦 Toru está confundido...',
-        text2: 'Algo raro pasó. ¿Podrías intentarlo de nuevo?',
+        text1: 'Error inesperado',
+        text2: 'Ocurrió un problema. Intente nuevamente.',
         position: 'bottom'
       });
     }
@@ -198,6 +205,7 @@ const handleRegister = async () => {
     setIsLoading(false);
   }
 };
+
 
 
   return (

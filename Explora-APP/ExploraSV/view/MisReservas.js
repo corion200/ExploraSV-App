@@ -17,7 +17,6 @@ import BottomNavBar from './components/nav';
 import { obtenerMisReservas } from './../api/reservas';
 
 export default function MisReservas({ navigation }) {
-  // ✅ SOLUCIÓN: Inicializar como array vacío
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -44,22 +43,20 @@ export default function MisReservas({ navigation }) {
       const response = await obtenerMisReservas();
       console.log('📦 Respuesta API misReservas:', response);
       
-      // ✅ IMPORTANTE: Verificar la estructura de la respuesta
       if (response && response.success && Array.isArray(response.reservas)) {
         setReservas(response.reservas);
         console.log('✅ Reservas cargadas:', response.reservas.length);
       } else if (response && Array.isArray(response)) {
-        // Si la API devuelve directamente un array
         setReservas(response);
       } else {
         console.warn('⚠️ Formato de respuesta inesperado:', response);
-        setReservas([]); // Mantener como array vacío
+        setReservas([]); 
         setError('No se pudieron cargar las reservas');
       }
     } catch (err) {
       console.error('❌ Error cargando reservas:', err);
       setError(err.message || 'Error al cargar reservas');
-      setReservas([]); // ✅ Mantener como array vacío en caso de error
+      setReservas([]);
     } finally {
       setLoading(false);
     }
@@ -80,7 +77,7 @@ export default function MisReservas({ navigation }) {
         day: 'numeric'
       });
     } catch {
-      return fecha; // Devolver fecha original si no se puede formatear
+      return fecha;
     }
   };
 
@@ -100,7 +97,6 @@ export default function MisReservas({ navigation }) {
   };
 
   const renderReservaItem = ({ item }) => {
-    // ✅ Usar tanto formato nuevo como legacy para compatibilidad
     const reservaId = item.id || item.Id_Rese;
     const fechaReserva = item.fecha_reserva || item.Fec_Rese;
     const estado = item.estado || item.Est_Rese;
@@ -192,7 +188,7 @@ export default function MisReservas({ navigation }) {
     );
   };
 
-  // ✅ Mostrar loading
+
   if (loading) {
     return (
       <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
@@ -215,7 +211,6 @@ export default function MisReservas({ navigation }) {
     );
   }
 
-  // ✅ Mostrar error
   if (error) {
     return (
       <SafeAreaView style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
@@ -247,7 +242,7 @@ export default function MisReservas({ navigation }) {
     );
   }
 
-  // ✅ Verificación adicional antes de renderizar (por si acaso)
+
   if (!Array.isArray(reservas)) {
     console.warn('⚠️ reservas no es un array:', reservas);
     return (
@@ -293,7 +288,7 @@ export default function MisReservas({ navigation }) {
             Cuando hagas una reserva, aparecerá aquí
           </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('Search')}
             style={[tw`mt-6 px-6 py-3 rounded-xl`, { backgroundColor: colors.secondary }]}
           >
             <Text style={tw`text-white font-semibold text-lg`}>Explorar lugares</Text>
@@ -314,7 +309,6 @@ export default function MisReservas({ navigation }) {
               tintColor={colors.secondary}
             />
           }
-          // ✅ Props de optimización
           removeClippedSubviews={true}
           maxToRenderPerBatch={10}
           windowSize={10}

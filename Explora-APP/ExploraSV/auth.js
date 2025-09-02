@@ -3,7 +3,7 @@ import api from './api';
 
 export async function login(Correo_Cli, Contra_Cli, navigation, Id_Cli) {
   try {
-    const response = await api.post('login', {
+    const response = await api.post('/login', {
       Correo_Cli,
       Contra_Cli,
       Id_Cli
@@ -16,7 +16,7 @@ export async function login(Correo_Cli, Contra_Cli, navigation, Id_Cli) {
       await AsyncStorage.setItem('authToken', token);
       await AsyncStorage.setItem('Turista', JSON.stringify(Turista));
 
-      console.log('Toru dio la bienvenida a:', Turista.Nom_Cli);
+      console.log('Tori dio la bienvenida a:', Turista.Nom_Cli);
     
       if (navigation && typeof navigation.reset === 'function') {
         navigation.reset({
@@ -29,11 +29,11 @@ export async function login(Correo_Cli, Contra_Cli, navigation, Id_Cli) {
     
       return response.data;
     } else {
-      console.log('Toru dice: Credenciales incorrectas');
+      console.log('Tori dice: Credenciales incorrectas');
       return null;
     }
   } catch (error) {
-    console.log('Toru no pudo conectarse:', error.response?.data?.message || 'Credenciales incorrectas');
+    console.log('Tori no pudo conectarse:', error.response?.data?.message || 'Credenciales incorrectas');
     return null;
   }
 }
@@ -51,21 +51,21 @@ export async function register(Nom_Cli, Correo_Cli, Contra_Cli, Contra_Cli_confi
 
     if (token) {
       await AsyncStorage.setItem('authToken', token);
-      console.log('Toru registró exitosamente al usuario');
+      console.log('Tori registró exitosamente al usuario');
       return response.data;
     } else {
-      console.log('Toru dice: No se recibió token del servidor');
+      console.log('Tori dice: No se recibió token del servidor');
       return { 
         success: false, 
-        message: 'Toru no pudo completar el registro. Intenta de nuevo.' 
+        message: 'Tori no pudo completar el registro. Intenta de nuevo.' 
       };
     }
   } catch (error) {
-    console.log('Toru encontró un problema en el registro:', error.response?.data || error.message);
+    console.log('Tori encontró un problema en el registro:', error.response?.data || error.message);
     
     return { 
       success: false, 
-      message: error.response?.data?.message || 'Toru no pudo registrarte en este momento',
+      message: error.response?.data?.message || 'Tori no pudo registrarte en este momento',
       errors: error.response?.data?.errors || null
     };
   }

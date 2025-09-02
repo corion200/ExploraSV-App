@@ -15,7 +15,7 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Verificamos si ya hay sesión activa
+  // Verifica si ya hay sesión activa
   useEffect(() => {
     const checkSession = async () => {
       const session = await getCurrentUser();
@@ -26,7 +26,7 @@ const SignIn = () => {
     checkSession();
   }, []);
 
-// Agrega esta función en SignIn.js, antes de handleLogin
+
 const validateForm = () => {
   const newErrors = {};
   
@@ -41,24 +41,23 @@ const validateForm = () => {
 };
 
 
-  // Validación en tiempo real con mensajes de Toru
 const validateEmail = (email) => {
   if (!email.trim()) {
-    return '🐦 ¡Oye! Toru necesita tu correo para poder ayudarte';
+    return 'Debe ingresar un correo electrónico.';
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return '🐦 Mmm... Toru dice que ese correo no se ve bien. ¿Podrías revisarlo?';
+    return 'El formato del correo electrónico no es válido.';
   }
   return null;
 };
 
 const validatePassword = (password) => {
   if (!password) {
-    return '🐦 ¡Hey! Toru no puede dejarte pasar sin tu contraseña';
+    return 'Debe ingresar una contraseña.';
   }
   if (password.length < 6) {
-    return '🐦 Toru dice que tu contraseña necesita al menos 6 caracteres para ser segura';
+    return 'La contraseña debe tener al menos 6 caracteres.';
   }
   return null;
 };
@@ -68,8 +67,8 @@ const handleLogin = async () => {
   if (!validateForm()) {
     Toast.show({
       type: 'error',
-      text1: '🐦 ¡Espera un momento!',
-      text2: 'Toru notó que faltan algunos datos importantes.',
+      text1: 'Error de validación',
+      text2: 'Por favor complete los campos requeridos correctamente.',
       position: 'bottom'
     });
     return;
@@ -82,21 +81,22 @@ const handleLogin = async () => {
   if (result) {
     Toast.show({
       type: 'success',
-      text1: '🐦 ¡Toru está feliz! 🎉',
-      text2: 'Te ha dado la bienvenida correctamente.',
+      text1: 'Acceso concedido',
+      text2: 'Ha iniciado sesión correctamente.',
       position: 'bottom'
     });
   } else {
     Toast.show({
       type: 'error',
-      text1: '🐦 ¡Ups! Toru dice...',
-      text2: 'Esos datos no coinciden con lo que tiene en su memoria.',
+      text1: 'Credenciales inválidas',
+      text2: 'El correo o la contraseña no coinciden.',
       position: 'bottom'
     });
   }
 
   setIsLoading(false);
 };
+
 
   return (
     <KeyboardAwareScrollView

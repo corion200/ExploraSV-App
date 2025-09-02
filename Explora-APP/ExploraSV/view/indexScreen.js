@@ -30,10 +30,6 @@ const IndexScreen = ({ navigation }) => {
     }, [isFocused]);
 
     const categories = [
-        { id: 'senderismo', name: 'Senderismo', icon: 'hiking', screen: 'Senderismo' },
-        { id: 'playas', name: 'Playas', icon: 'umbrella-beach', screen: 'Playas' },
-        { id: 'eco-turismo', name: 'Eco Turismo', icon: 'leaf', screen: 'EcoTurismo' },
-        { id: 'aventura', name: 'Aventura', icon: 'compass', screen: 'Aventura' }
     ];
 
     const handleCategoryPress = (category) => {
@@ -49,7 +45,7 @@ const IndexScreen = ({ navigation }) => {
             contentContainerStyle={tw`pb-24`}
             style={tw`flex-1`}
           >
-            {/* Header mejorado */}
+            {/* Header */}
             <View style={tw`bg-white px-6 py-4 mb-4 shadow-sm`}>
               <View style={tw`flex-row justify-between items-center`}>
                 <View style={tw`flex-1`}>
@@ -74,7 +70,7 @@ const IndexScreen = ({ navigation }) => {
             </View>
 
             <View style={tw`px-6`}>
-              {/* Banner mejorado */}
+              {/* Banner */}
               <View style={tw`bg-[#101C5D] rounded-2xl p-6 mb-8 shadow-lg`}>
                 <View style={tw`flex-row items-center mb-3`}>
                   <Icon name="star" size={24} color="#D4AF37" style={tw`mr-2`} />
@@ -95,11 +91,8 @@ const IndexScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              {/* Categorías mejoradas */}
+              {/* Categorías */}
               <View style={tw`mb-8`}>
-                <Text style={tw`text-xl font-bold text-[#101C5D] mb-6`}>
-                  Explora por categorías
-                </Text>
                 
                 <View style={tw`flex-row justify-between`}>
                   {categories.map((category) => (
@@ -120,7 +113,7 @@ const IndexScreen = ({ navigation }) => {
                 </View>
               </View>
 
-              {/* Sección de lugares mejorada */}
+              {/* Sección de lugares */}
               <View style={tw`mb-4`}>
                 <View style={tw`flex-row justify-between items-center mb-6`}>
                   <Text style={tw`text-xl font-bold text-[#101C5D]`}>
