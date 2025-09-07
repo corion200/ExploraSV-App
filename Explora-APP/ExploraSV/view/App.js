@@ -3,6 +3,7 @@ import { View, Text, FlatList, ImageBackground, TouchableOpacity, Dimensions,  S
 import { useNavigation } from '@react-navigation/native';
 import tw from './tw';
 import { StatusBar } from 'react-native';
+import '../i18n';
 
 
 
