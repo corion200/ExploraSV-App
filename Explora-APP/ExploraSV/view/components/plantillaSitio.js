@@ -53,24 +53,23 @@ const transformarDatosSitio = (datosRaw) => {
     tipo = 'hotel';
     mostrarBotonReserva = true;
     esReservable = true;
-    console.log('🏨 Detectado como HOTEL');
+    console.log(' Detectado como HOTEL');
   } else if (datosRaw.Nom_Rest || datosRaw.Tel_Rest || datosRaw.HoraI_Rest || datosRaw.Tipo_Comida_Rest) {
     tipo = 'restaurante';
     mostrarBotonReserva = true;
     esReservable = true;
-    console.log('🍽️ Detectado como RESTAURANTE');
+    console.log('Detectado como RESTAURANTE');
   } else if (datosRaw.Nom_Siti || datosRaw.Activi_Siti) {
     tipo = 'sitio_turistico';
     mostrarBotonReserva = false;
     esReservable = false;
-    console.log('🏞️ Detectado como SITIO TURÍSTICO');
+    console.log('Detectado como SITIO TURÍSTICO');
   }
 
   console.log('Tipo detectado:', tipo);
   console.log('Mostrar botón reserva:', mostrarBotonReserva);
   console.log('Es reservable:', esReservable);
 
-  // ⭐ MAPEAR A LOS CAMPOS QUE ESPERA EL COMPONENTE PLANTILLASITIO
   const datosTransformados = {
     // Campos que usa PlantillaSitio
     Id_Siti: datosRaw.Id_Hotel || datosRaw.Id_Rest || datosRaw.Id_Siti,
@@ -133,7 +132,6 @@ const transformarDatosSitio = (datosRaw) => {
 
 
 const PlantillaSitio = (props) => {
-  // ⭐ AGREGAR ESTOS LOGS AL INICIO
   console.log('=== PROPS RECIBIDAS EN PLANTILLA SITIO ===');
   console.log('Tipo:', props.tipo);
   console.log('Navigation disponible:', !!props.navigation);
@@ -152,13 +150,13 @@ const PlantillaSitio = (props) => {
     precios = [],
     actividades = [],
     recomendaciones = [],
-    tipo = 'sitio_turistico', // ⭐ Usar el tipo de props
+    tipo = 'sitio_turistico',
     tipo_habitacion,
     cantidad_personas,
     navigation
   } = props;
 
-  // Colores hex como variables para uso en estilos inline
+
   const colors = {
     primary: '#101C5D',
     secondary: '#569298',
@@ -251,12 +249,12 @@ const PlantillaSitio = (props) => {
               }
             >
               <Text style={{ color: 'white', fontWeight: '700', fontSize: 18 }}>
-                🏨 Reservar {tipo === 'hotel' ? 'Hotel' : 'Mesa'}
+                Reservar {tipo === 'hotel' ? 'Hotel' : 'Mesa'}
               </Text>
             </TouchableOpacity>
           )}
 
-          {/* Horario - mostrar para todos los tipos */}
+          {/* Horario - Se muestra para todos los tipos */}
           {horario && horario !== 'null - null' && horario !== ' - ' && (
             <>
               <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 6 }}>
@@ -293,39 +291,6 @@ const PlantillaSitio = (props) => {
                   </Text>
                 </>
               )}
-            </>
-          )}
-
-          {/* Precios - solo para sitios turísticos */}
-          {tipo === 'sitio_turistico' && (
-            <>
-              <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 8 }}>
-                Costo de entrada:
-              </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 18 }}>
-                {precios.length > 0 ? (
-                  precios.map((p, i) => (
-                    <Text
-                      key={i}
-                      style={{
-                        backgroundColor: colors.secondary,
-                        color: 'white',
-                        paddingHorizontal: 10,
-                        paddingVertical: 5,
-                        borderRadius: 16,
-                        marginRight: 8,
-                        marginBottom: 8,
-                        fontWeight: '600',
-                        fontSize: 13,
-                      }}
-                    >
-                      {p}
-                    </Text>
-                  ))
-                ) : (
-                  <Text style={{ color: colors.neutralDark }}>No hay información de precios</Text>
-                )}
-              </View>
             </>
           )}
 

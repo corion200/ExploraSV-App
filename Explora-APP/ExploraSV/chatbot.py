@@ -70,17 +70,17 @@ def health():
     return jsonify({
         "status": "ok",
         "database": db_status,
-        "mascot": "Toru el Torogoz",
+        "mascot": "Tori el Torogoz",
         "platform": "ExploraSV",
         "version": "1.0.0",
         "timestamp": datetime.now().isoformat()
     })
 
-# Endpoint principal del chatbot - Toru el Torogoz
+# Endpoint principal del chatbot - Tori el Torogoz
 @app.route('/chatbot', methods=['POST'])
 @require_auth
 def chatbot_response():
-    """Toru el Torogoz responde a los turistas"""
+    """Tori el Torogoz responde a los turistas"""
     try:
         data = request.get_json(silent=True) or {}
         user_message = (data.get('message') or '').strip()
@@ -88,10 +88,10 @@ def chatbot_response():
         if not user_message:
             return jsonify({"error": "¡Pío pío! Necesito que me escribas algo para poder ayudarte."}), 400
         
-        logger.info(f"Toru recibe mensaje: {user_message}")
+        logger.info(f"Tori recibe mensaje: {user_message}")
         
-        # Generar respuesta como Toru
-        response_message = generate_toru_response(user_message)
+        # Generar respuesta como Tori
+        response_message = generate_Tori_response(user_message)
         
         # Guardar conversación
         save_conversation(user_message, response_message)
@@ -99,19 +99,19 @@ def chatbot_response():
         return jsonify({"response": response_message})
         
     except Exception as e:
-        logger.error(f"Error en Toru: {e}")
+        logger.error(f"Error en Tori: {e}")
         return jsonify({"response": "¡Pío pío! Algo salió mal. Inténtalo de nuevo en un momento."})
 
-def generate_toru_response(message):
-    """Toru el Torogoz genera respuestas personalizadas para turistas"""
+def generate_Tori_response(message):
+    """Tori el Torogoz genera respuestas personalizadas para turistas"""
     txt = message.lower()
     
-    # Saludos - Toru se presenta
+    # Saludos - Tori se presenta
     if any(word in txt for word in ['hola', 'hey', 'buenos días', 'buenas tardes', 'buenas noches', 'hi']):
         greetings = [
-            "¡Pío pío! 🐦 ¡Hola! Soy Toru, tu torogoz guía de ExploraSV. Estoy aquí para ayudarte a descubrir lo mejor de El Salvador.",
-            "¡Qué alegría verte! 🌟 Soy Toru, el torogoz más viajero de El Salvador. ¿Listo para explorar nuestro hermoso país?",
-            "¡Pío pío! ¡Bienvenido a ExploraSV! 🇸🇻 Soy Toru y conozco todos los rincones mágicos de nuestra tierra. ¿En qué puedo ayudarte?"
+            "¡Pío pío! 🐦 ¡Hola! Soy Tori, tu torogoz guía de ExploraSV. Estoy aquí para ayudarte a descubrir lo mejor de El Salvador.",
+            "¡Qué alegría verte! 🌟 Soy Tori, el torogoz más viajero de El Salvador. ¿Listo para explorar nuestro hermoso país?",
+            "¡Pío pío! ¡Bienvenido a ExploraSV! 🇸🇻 Soy Tori y conozco todos los rincones mágicos de nuestra tierra. ¿En qué puedo ayudarte?"
         ]
         return random.choice(greetings)
     
@@ -193,7 +193,7 @@ def generate_toru_response(message):
 
 ¡Solo pregúntame lo que necesites saber! 🐦"""
     
-    # Respuesta por defecto de Toru
+    # Respuesta por defecto de Tori
     else:
         default_responses = [
             "¡Pío pío! Esa es una pregunta interesante. Como torogoz, conozco muchos lugares increíbles en El Salvador. ¿Te puedo ayudar con información sobre hoteles, restaurantes o sitios turísticos?",
@@ -304,7 +304,7 @@ def get_tourist_sites_info():
         return "¡Problemita técnico! Como torogoz explorador, conozco muchos lugares. ¡Inténtalo de nuevo!"
 
 def save_conversation(user_message, bot_response):
-    """Guardar conversación de Toru en la base de datos"""
+    """Guardar conversación de Tori en la base de datos"""
     try:
         db = get_db_connection()
         if not db:
@@ -312,7 +312,7 @@ def save_conversation(user_message, bot_response):
             
         cursor = db.cursor()
         
-        # Usar tabla chatbot existente o crear una nueva para Toru
+        # Usar tabla chatbot existente o crear una nueva para Tori
         query = """
         INSERT INTO chatbot (Mesj, Resp) 
         VALUES (%s, %s)
@@ -323,7 +323,7 @@ def save_conversation(user_message, bot_response):
         db.close()
         
     except Exception as e:
-        logger.error(f"Error guardando conversación de Toru: {e}")
+        logger.error(f"Error guardando conversación de Tori: {e}")
 
 # Mantener endpoints originales de consultas para compatibilidad
 @app.route('/consultas', methods=['GET'])
@@ -350,7 +350,7 @@ if __name__ == '__main__':
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("DEBUG", "True").lower() == "true"
     
-    logger.info(f"🐦 Iniciando Toru el Torogoz - ExploraSV Chatbot")
+    logger.info(f"🐦 Iniciando Tori el Torogoz - ExploraSV Chatbot")
     logger.info(f"Puerto: {port} | Base de datos: {DB_CONFIG['database']}")
     
     app.run(host="0.0.0.0", port=port, debug=debug)

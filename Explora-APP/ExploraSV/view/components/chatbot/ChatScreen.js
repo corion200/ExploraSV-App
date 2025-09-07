@@ -201,7 +201,7 @@ export default function ChatScreen({ navigation }) {
 
   const renderMessage = ({ item, index }) => (
     <View style={tw`mb-4 px-4 ${item.role === 'user' ? 'items-end' : 'items-start'}`}>
-      {/* Avatar y nombre de Toru para mensajes del bot */}
+      {/* Avatar y nombre de Tori para mensajes del bot */}
       {item.role === 'bot' && (
         <View style={tw`flex-row items-center mb-2`}>
           <View style={tw`w-10 h-10 rounded-full bg-white justify-center items-center overflow-hidden shadow-md border-2 border-[#D4AF37]`}>
@@ -211,7 +211,7 @@ export default function ChatScreen({ navigation }) {
               resizeMode="contain"
             />
           </View>
-          <Text style={tw`ml-2 text-[#101C5D] font-bold text-sm`}>Toru</Text>
+          <Text style={tw`ml-2 text-[#101C5D] font-bold text-sm`}>Tori</Text>
         </View>
       )}
       
@@ -242,7 +242,7 @@ export default function ChatScreen({ navigation }) {
 
   // Mensajes sugeridos iniciales
   const suggestedMessages = [
-    { text: "¡Hola Toru! 👋", icon: "hand-left" },
+    { text: "¡Hola Tori! 👋", icon: "hand-left" },
     { text: "Hoteles recomendados", icon: "bed" },
     { text: "Lugares turísticos", icon: "camera" },
     { text: "¿Dónde comer?", icon: "restaurant" },
@@ -271,7 +271,7 @@ export default function ChatScreen({ navigation }) {
           </TouchableOpacity>
           
           <View style={tw`flex-row items-center flex-1`}>
-            {/* Avatar de Toru en header */}
+            {/* Avatar de Tori en header */}
             <View style={tw`w-11 h-11 rounded-full bg-white justify-center items-center overflow-hidden border-2 border-[#D4AF37] shadow-lg`}>
               <Image
                 source={require('../../../assets/Favicon25.png')}
@@ -280,7 +280,7 @@ export default function ChatScreen({ navigation }) {
               />
             </View>
             <View style={tw`ml-3`}>
-              <Text style={tw`text-white text-lg font-bold`}>Toru</Text>
+              <Text style={tw`text-white text-lg font-bold`}>Tori</Text>
               <View style={tw`flex-row items-center`}>
                 {loading && (
                   <View style={tw`w-2 h-2 rounded-full bg-[#D4AF37] mr-2`}>
@@ -328,7 +328,7 @@ export default function ChatScreen({ navigation }) {
                 </Animated.View>
                 
                 <Text style={tw`text-3xl font-bold text-[#101C5D] text-center mb-3`}>
-                  ¡Hola, soy Toru!
+                  ¡Hola, soy Tori!
                 </Text>
                 <Text style={tw`text-[#333333] text-center text-base leading-6 mb-8 px-4`}>
                   Tu torogoz guía personal de ExploraSV.{'\n'}
@@ -374,7 +374,7 @@ export default function ChatScreen({ navigation }) {
                   <View style={tw`w-2 h-2 rounded-full bg-[#D4AF37] mr-1 animate-bounce delay-100`} />
                   <View style={tw`w-2 h-2 rounded-full bg-[#569298] animate-bounce delay-200`} />
                 </View>
-                <Text style={tw`ml-3 text-[#333333] text-sm font-medium`}>Toru está escribiendo...</Text>
+                <Text style={tw`ml-3 text-[#333333] text-sm font-medium`}>Tori está escribiendo...</Text>
               </View>
             </View>
           )}
@@ -398,7 +398,7 @@ export default function ChatScreen({ navigation }) {
               <TextInput
                 value={inputText}
                 onChangeText={setInputText}
-                placeholder="Escribe tu mensaje a Toru..."
+                placeholder="Escribe tu mensaje a Tori..."
                 style={tw`flex-1 text-base text-[#333333] py-2 max-h-24`}
                 multiline={true}
                 maxLength={500}

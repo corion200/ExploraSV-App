@@ -8,7 +8,6 @@ import { useNavigation,useNavigationState  } from '@react-navigation/native';
 import tw from 'twrnc';
 
 /**
- * BottomNavBar - Componente de barra de navegación inferior para React Native
  * @param {Object} props - Propiedades del componente
  * @param {string} [props.initialTab='home'] - Pestaña activa inicial
  * @param {function} [props.onTabChange] - Función que se llama al cambiar de pestaña

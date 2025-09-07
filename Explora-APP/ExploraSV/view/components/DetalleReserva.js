@@ -19,7 +19,7 @@ export default function DetalleReserva({ route, navigation }) {
     vibrant: '#F97C7C',
   };
 
-  // ✅ Compatibilidad con ambos formatos de datos
+ 
   const reservaId = reserva.id || reserva.Id_Rese;
   const fechaReserva = reserva.fecha_reserva || reserva.Fec_Rese;
   const estado = reserva.estado || reserva.Est_Rese;
@@ -104,11 +104,11 @@ export default function DetalleReserva({ route, navigation }) {
         </View>
       </LinearGradient>
 
-      {/* ✅ CONTENIDO CON PADDING BOTTOM PARA EL NAV */}
+      {/* CONTENIDO CON PADDING BOTTOM PARA EL NAV */}
       <ScrollView 
         style={tw`flex-1 px-6 py-4`} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={tw`pb-32`} // ✅ AGREGAR PADDING BOTTOM
+        contentContainerStyle={tw`pb-32`} 
       >
         {/* Información principal */}
         <View style={tw`bg-white rounded-3xl p-6 mb-6 shadow-lg`}>
@@ -221,20 +221,15 @@ export default function DetalleReserva({ route, navigation }) {
           <View style={tw`flex-row items-center justify-between`}>
             <View>
               <Text style={[tw`text-base`, { color: colors.neutralDark }]}>
-                Confirmación: {confirmada ? 'Confirmada' : 'Pendiente'}
+                Confirmación: {confirmada ? 'Pendiente' : 'Pendiente'}
               </Text>
               <Text style={[tw`text-sm mt-1`, { color: colors.secondary }]}>
                 {confirmada 
-                  ? 'Tu reserva ha sido confirmada por el establecimiento' 
+                  ? 'Esperando confirmación del establecimiento' 
                   : 'Esperando confirmación del establecimiento'
                 }
               </Text>
             </View>
-            <Ionicons 
-              name={confirmada ? 'checkmark-circle' : 'time'} 
-              size={24} 
-              color={confirmada ? colors.secondary : colors.complementary} 
-            />
           </View>
         </View>
 

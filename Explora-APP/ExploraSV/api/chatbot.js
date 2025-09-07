@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Cambia esta línea por tu IP local
-const CHATBOT_BASE_URL = 'http://192.168.1.17:5000'; // Tu IP aquí
+const CHATBOT_BASE_URL = 'http://192.168.1.61:5000'; // Tu IP aquí
 
 export const chatbotApi = axios.create({
   baseURL: CHATBOT_BASE_URL,

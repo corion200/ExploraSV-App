@@ -12,7 +12,7 @@ const COLORS = {
   white: '#FFFFFF'
 };
 
-const ToruToast = ({ type, text1, text2 }) => {
+const ToriToast = ({ type, text1, text2 }) => {
   const getBorderColor = () => {
     switch (type) {
       case 'success': return COLORS.secondary;
@@ -49,7 +49,7 @@ const ToruToast = ({ type, text1, text2 }) => {
       borderLeftWidth: 5,
       borderLeftColor: getBorderColor(),
     }}>
-      {/* Avatar de Toru */}
+      {/* Avatar de Tori */}
       <View style={{
         width: 50,
         height: 50,
@@ -101,7 +101,7 @@ const ToruToast = ({ type, text1, text2 }) => {
 };
 
 export const toastConfig = {
-  success: (props) => <ToruToast type="success" {...props} />,
-  error: (props) => <ToruToast type="error" {...props} />,
-  info: (props) => <ToruToast type="info" {...props} />,
+  success: (props) => <ToriToast type="success" {...props} />,
+  error: (props) => <ToriToast type="error" {...props} />,
+  info: (props) => <ToriToast type="info" {...props} />,
 };

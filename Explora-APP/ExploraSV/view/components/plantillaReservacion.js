@@ -36,7 +36,7 @@ export default function PlantillaReservacion() {
   const [loadingHabitaciones, setLoadingHabitaciones] = useState(false);
   const [showHabitacionPicker, setShowHabitacionPicker] = useState(false);
 
-  // NUEVO: Estados para datos completos con precios
+  // Estados para datos completos con precios
   const [datosCompletos, setDatosCompletos] = useState(null);
   const [loadingDatos, setLoadingDatos] = useState(false);
 
@@ -44,7 +44,7 @@ export default function PlantillaReservacion() {
   const [pickerMode, setPickerMode] = useState("date");
   const [currentPicker, setCurrentPicker] = useState(null);
 
-  // NUEVO: Función para cargar datos completos del lugar (incluyendo precios)
+  // Función para cargar los datos del lugar (incluyendo precios)
   const cargarDatosCompletos = async () => {
     if (!datosLugar?.id) return;
     
@@ -55,13 +55,13 @@ export default function PlantillaReservacion() {
       
       switch (tipoLugar) {
         case 'hotel':
-          url = `http://192.168.1.17:8000/api/hoteles/${datosLugar.id}`;
+          url = `http://192.168.1.61:8000/api/hoteles/${datosLugar.id}`;
           break;
         case 'restaurante':
-          url = `http://192.168.1.17:8000/api/restaurantes/${datosLugar.id}`;
+          url = `http://192.168.1.61:8000/api/restaurantes/${datosLugar.id}`;
           break;
         case 'sitio_turistico':
-          url = `http://192.168.1.17:8000/api/sitios/${datosLugar.id}`;
+          url = `http://192.168.1.61:8000/api/sitios/${datosLugar.id}`;
           break;
         default:
           setDatosCompletos(datosLugar);
@@ -98,7 +98,7 @@ export default function PlantillaReservacion() {
     }
   }, [tipoLugar, datosLugar]);
 
-  // NUEVO: Cargar datos completos
+  // Cargar datos completos
   useEffect(() => {
     cargarDatosCompletos();
   }, [tipoLugar, datosLugar]);
@@ -107,7 +107,7 @@ export default function PlantillaReservacion() {
     setLoadingHabitaciones(true);
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.168.1.17:8000/api/hoteles/${datosLugar.id}/habitaciones`, {
+      const response = await fetch(`http://192.168.1.61:8000/api/hoteles/${datosLugar.id}/habitaciones`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -228,7 +228,7 @@ export default function PlantillaReservacion() {
     return noches > 0 ? noches : 0;
   };
 
-  // ACTUALIZADO: Función de cálculo de precios con datos de la BD
+  // Función de cálculo de precios con datos de la BD
   const calcularPrecios = () => {
     let precioPorNoche = 50; // Precio base por defecto
     const noches = calcularNoches();
@@ -249,7 +249,7 @@ export default function PlantillaReservacion() {
     }
     
     // Para hoteles: multiplicar por número de noches
-    // Para restaurantes y sitios: precio ya calculado con personas
+    // Para restaurantes: precio ya calculado con personas
     const subTotal = tipoLugar === 'hotel' ? precioPorNoche * noches : precioPorNoche;
     const costoServicio = 10;
     const total = subTotal + costoServicio;
@@ -259,7 +259,7 @@ export default function PlantillaReservacion() {
 
   const { subTotal, costoServicio, total, precioPorNoche, noches } = calcularPrecios();
 
-  // ACTUALIZADO: Función procesarReserva con payload correcto para Laravel
+  // Función procesarReserva con navegación
   const procesarReserva = async () => {
     if (!fechaInicioDate || !fechaFinDate || !horaInicio || !horaFin) {
       Alert.alert(
@@ -355,7 +355,32 @@ export default function PlantillaReservacion() {
         )} - ${fin.toLocaleString("es-ES")}\nTotal: $${total.toFixed(
           2
         )}\nID: ${reservaCreada.id || reservaCreada.reserva?.Id_Rese || "N/A"}`,
-        [{ text: "OK", onPress: () => navigation.goBack() }]
+        [{ 
+          text: "OK", 
+          onPress: () => navigation.navigate("Payment", {
+            reservaData: {
+              id: reservaCreada.id || reservaCreada.reserva?.Id_Rese,
+              total: total,
+              subTotal: subTotal,
+              costoServicio: costoServicio,
+              lugar: {
+                nombre: datosLugar.nombre || datosLugar.Nom_Hotel || datosLugar.Nom_Rest || datosLugar.Nom_Siti,
+                tipo: tipoLugar
+              },
+              personas: cantidadPersonas,
+              fechas: {
+                inicio: inicio.toLocaleString("es-ES"),
+                fin: fin.toLocaleString("es-ES")
+              },
+              habitacion: habitacionSeleccionadaData ? {
+                numero: habitacionSeleccionadaData.numero,
+                tipo: habitacionSeleccionadaData.tipo,
+                costo: habitacionSeleccionadaData.costo
+              } : null,
+              noches: noches
+            }
+          })
+        }]
       );
     } catch (error) {
       console.error('Error completo:', error);
@@ -708,7 +733,7 @@ export default function PlantillaReservacion() {
           </View>
         </View>
 
-        {/* Botón de confirmación */}
+        {/* Botón de confirmación ACTUALIZADO */}
         <LinearGradient
           colors={['#D4AF37', '#B8941F']}
           style={tw`rounded-2xl mb-8 ${

@@ -27,7 +27,6 @@ export default function List({ navigation }) {
         <TouchableOpacity
           key={`indexscreen-lugar-${place.id}-${index}`}
           onPress={() => {
-            // CAMBIO: Todos los tipos van hacia 'Site'
             navigation.navigate('Site', {
               sitio: {
                 ...place,

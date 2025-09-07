@@ -35,7 +35,7 @@ export default function Comentario({ Id_Siti, tipo}) {
           setUserData(user);
           setIdUsuario(user?.Id_Cli ?? null);
   
-          // 🔹 Cargar reseñas después de tener el Id del usuario
+          // Cargar reseñas después de tener el Id del usuario
           obtenerResenas(user?.Id_Cli ?? null);
         } catch (error) {
           console.error('Error al cargar usuario:', error);
@@ -59,7 +59,7 @@ export default function Comentario({ Id_Siti, tipo}) {
       setResenas(response.data);
     } catch (error) {
       console.error('Error al obtener reseñas:', error?.response?.data || error.message);
-      // En caso de error (no hay reseñas), establecemos array vacío
+      // En caso de error establecer el array vacío
       setResenas([]);
     }
   };
