@@ -13,6 +13,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 import tw from 'twrnc';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { useTranslation } from 'react-i18next';
 import api from '../api';
 
 const COLORS = {
@@ -22,12 +23,11 @@ const COLORS = {
   light: '#F5F5F5',
   dark: '#333333',
   coral: '#F97C7C',
-  goldHover: '#c89e2f',
-  coralHover: '#e96363',
   cardShadow: '#3333331A'
 };
 
 const PaymentScreen = () => {
+  const { t } = useTranslation();
   const route = useRoute();
   const navigation = useNavigation();
   const { reservaData } = route.params || {};
@@ -43,20 +43,20 @@ const PaymentScreen = () => {
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.primary} />
         <Ionicons name="alert-circle-outline" size={64} color={COLORS.coral} />
         <Text style={tw`text-[${COLORS.coral}] text-lg mt-4 text-center px-6`}>
-          Error: No hay datos de reserva disponibles
+          {t('Error: No hay datos de reserva disponibles')}
         </Text>
         <TouchableOpacity 
           onPress={() => navigation.goBack()}
           style={tw`mt-6 bg-[${COLORS.secondary}] px-6 py-3 rounded-lg`}
         >
-          <Text style={tw`text-white font-semibold`}>Volver</Text>
+          <Text style={tw`text-white font-semibold`}>{t('Volver')}</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   const paymentMethods = [
-    { id: 'tarjeta', name: 'Tarjeta', icon: '💳' },
+    { id: 'tarjeta', name: t('Tarjeta'), icon: '💳' },
   ];
 
   const handlePaymentMethodSelect = (methodId) => {
@@ -66,7 +66,7 @@ const PaymentScreen = () => {
   const handlePayment = async () => {
     if (selectedPaymentMethod === 'tarjeta') {
       if (!cardDetails.complete) {
-        Alert.alert('Error', 'Completa los datos de tu tarjeta');
+        Alert.alert(t('Error de pago'), t('Completa los datos de tu tarjeta'));
         return;
       }
       setLoading(true);
@@ -81,24 +81,24 @@ const PaymentScreen = () => {
         const { clientSecret } = response.data;
         const { paymentIntent, error } = await confirmPayment(clientSecret, { paymentMethodType: 'Card' });
         if (error) {
-          Alert.alert('Error de pago', error.message);
+          Alert.alert(t('Error de pago'), error.message);
         } else if (paymentIntent) {
           Alert.alert(
-            '¡Pago exitoso!', 
-            `Tu pago de $${reservaData.total.toFixed(2)} se procesó correctamente.\n\nID de transacción: ${paymentIntent.id}`,
-            [{ text: 'Continuar', onPress: () => navigation.navigate('MisReservas') }]
+            t('¡Pago exitoso!'), 
+            `${t('Tu pago se procesó correctamente.')}\n\n${t('ID de transacción')}: ${paymentIntent.id}`,
+            [{ text: t('Continuar'), onPress: () => navigation.navigate('MisReservas') }]
           );
         }
       } catch (err) {
         console.error('Error procesando pago:', err);
-        Alert.alert('Error', 'No se pudo procesar el pago. Intenta nuevamente.');
+        Alert.alert(t('Error de pago'), t('No se pudo procesar el pago. Intenta nuevamente.'));
       } finally {
         setLoading(false);
       }
     } else if (selectedPaymentMethod === 'puntos') {
       Alert.alert(
-        'Pago con puntos',
-        'Esta funcionalidad estará disponible próximamente.',
+        t('Pago con puntos'),
+        t('Esta funcionalidad estará disponible próximamente.'),
         [{ text: 'OK' }]
       );
     }
@@ -114,7 +114,7 @@ const PaymentScreen = () => {
           <Ionicons name="arrow-back" size={26} color="#fff" />
         </TouchableOpacity>
         <Text style={tw`text-white text-lg font-extrabold flex-1 text-center`}>
-          Proceso de Pago
+          {t('Proceso de Pago')}
         </Text>
         <View style={tw`w-6`} />
       </View>
@@ -126,38 +126,38 @@ const PaymentScreen = () => {
           { backgroundColor: "#fff", shadowColor: COLORS.cardShadow, shadowRadius: 8, shadowOffset: { height: 4 }, shadowOpacity: 1, borderColor: COLORS.secondary + "30", borderWidth: 1 }
         ]}>
           <Text style={tw`text-xl font-extrabold mb-4 text-[${COLORS.primary}]`}>
-            <Ionicons name="receipt-outline" size={22} color={COLORS.primary} /> Resumen de la reserva
+            <Ionicons name="receipt-outline" size={22} color={COLORS.primary} /> {t('Resumen de la reserva')}
           </Text>
           <View style={tw`space-y-2 mb-3`}>
-            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>Lugar: </Text>{reservaData.lugar.nombre}</Text>
-            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>Tipo: </Text>
+            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>{t('Lugar')}: </Text>{reservaData.lugar.nombre}</Text>
+            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>{t('Tipo')}: </Text>
               <Text style={tw`capitalize`}>{reservaData.lugar.tipo}</Text>
             </Text>
-            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>Personas: </Text>{reservaData.personas}</Text>
+            <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>{t('Personas')}: </Text>{reservaData.personas}</Text>
             <Text style={tw`text-[${COLORS.dark}]`}>
-              <Text style={tw`font-bold`}>Fechas: </Text>
+              <Text style={tw`font-bold`}>{t('Fechas')}: </Text>
               <Text>{reservaData.fechas.inicio} - {reservaData.fechas.fin}</Text>
             </Text>
             {reservaData.habitacion && (
-              <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>Habitación: </Text>{reservaData.habitacion.numero} ({reservaData.habitacion.tipo})</Text>
+              <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>{t('Habitación')}: </Text>{reservaData.habitacion.numero} ({reservaData.habitacion.tipo})</Text>
             )}
             {reservaData.noches > 0 && (
-              <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>Noches: </Text>
-                {reservaData.noches} {reservaData.noches === 1 ? 'noche' : 'noches'}
+              <Text style={tw`text-[${COLORS.dark}]`}><Text style={tw`font-bold`}>{t('Noches')}: </Text>
+                {reservaData.noches} {reservaData.noches === 1 ? t('noche') : t('noches')}
               </Text>
             )}
           </View>
           <View style={tw`border-t border-[${COLORS.light}] pt-4`}>
             <View style={tw`flex-row justify-between mb-1`}>
-              <Text style={tw`text-[${COLORS.dark}]`}>Subtotal:</Text>
+              <Text style={tw`text-[${COLORS.dark}]`}>{t('Subtotal')}:</Text>
               <Text style={tw`font-bold text-[${COLORS.primary}]`}>${reservaData.subTotal.toFixed(2)}</Text>
             </View>
             <View style={tw`flex-row justify-between mb-1`}>
-              <Text style={tw`text-[${COLORS.dark}]`}>Costo servicio:</Text>
+              <Text style={tw`text-[${COLORS.dark}]`}>{t('Costo servicio')}:</Text>
               <Text style={tw`font-bold text-[${COLORS.primary}]`}>${reservaData.costoServicio.toFixed(2)}</Text>
             </View>
             <View style={tw`flex-row justify-between border-t border-[${COLORS.light}] pt-3`}>
-              <Text style={tw`text-xl font-bold text-[${COLORS.primary}]`}>Total:</Text>
+              <Text style={tw`text-xl font-bold text-[${COLORS.primary}]`}>{t('Total')}:</Text>
               <Text style={tw`text-2xl font-extrabold text-[${COLORS.gold}]`}>${reservaData.total.toFixed(2)}</Text>
             </View>
           </View>
@@ -166,7 +166,7 @@ const PaymentScreen = () => {
         {/* Métodos de pago */}
         <View style={tw`mb-6`}>
           <Text style={tw`text-lg font-bold mb-4 text-[${COLORS.primary}]`}>
-            <Ionicons name="card-outline" size={22} color={COLORS.primary} /> Método de pago
+            <Ionicons name="card-outline" size={22} color={COLORS.primary} /> {t('Método de pago')}
           </Text>
           <View style={tw`space-y-3`}>
             {paymentMethods.map((method) => (
@@ -204,7 +204,7 @@ const PaymentScreen = () => {
         {selectedPaymentMethod === 'tarjeta' && (
           <View style={tw`bg-[${COLORS.primary}] rounded-2xl p-6 mb-6`}>
             <Text style={tw`text-white text-lg font-bold mb-4`}>
-              Datos de la tarjeta
+              {t('Datos de la tarjeta')}
             </Text>
             <CardField
               postalCodeEnabled={false}
@@ -222,7 +222,7 @@ const PaymentScreen = () => {
               onCardChange={(card) => setCardDetails(card)}
             />
             <Text style={tw`text-white/70 text-xs mt-2`}>
-              💡 Usa 4242 4242 4242 4242 para pruebas
+              {t('💡 Usa 4242 4242 4242 4242 para pruebas')}
             </Text>
           </View>
         )}
@@ -248,14 +248,14 @@ const PaymentScreen = () => {
             <View style={tw`flex-row items-center`}>
               <ActivityIndicator color="white" size="small" />
               <Text style={tw`text-white text-lg font-bold ml-3`}>
-                Procesando...
+                {t('Procesando...')}
               </Text>
             </View>
           ) : (
             <>
               <Ionicons name="card" size={24} color="white" style={tw`mr-3`} />
               <Text style={tw`text-white text-lg font-bold`}>
-                Pagar ${reservaData.total.toFixed(2)}
+                {t('Pagar')} ${reservaData.total.toFixed(2)}
               </Text>
             </>
           )}

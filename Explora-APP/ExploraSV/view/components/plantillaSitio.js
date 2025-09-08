@@ -1,19 +1,64 @@
 import React from 'react';
 import { View, Text, Image, FlatList, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import tw from '../tw';
 import Comentario from "./reviewSitio";
 
 const screenWidth = Dimensions.get('window').width;
+const BASE_URL = "http://192.168.0.13:8000/";
 
-// Cambia esta IP y puerto a los de tu backend local
-const BASE_URL = "http://192.168.1.61:8000/";
-
+// ✅ FUNCIÓN TRANSFORMAR DATOS OPTIMIZADA
 const transformarDatosSitio = (datosRaw) => {
   console.log('=== TRANSFORMANDO DATOS ===');
-  console.log('Datos crudos recibidos:', JSON.stringify(datosRaw, null, 2));
+  console.log('Datos recibidos:', datosRaw);
 
-  let imagenFinal = datosRaw.imagen_url || datosRaw.image || datosRaw.imagen || datosRaw.Img || datosRaw.Img_Hotel || datosRaw.Img_Rest || null;
+  // ✅ Si los datos vienen del endpoint /translate-all (ya traducidos)
+  if (datosRaw.tipo && datosRaw.nombre && datosRaw.tipo_display) {
+    console.log('✅ Usando datos ya traducidos del backend');
+    
+    return {
+      // Campos principales ya traducidos
+      Id_Siti: datosRaw.id,
+      id: datosRaw.id,
+      title: datosRaw.nombre,        // ✅ Ya traducido
+      nombre: datosRaw.nombre,       // ✅ Ya traducido  
+      descripcion: datosRaw.descripcion, // ✅ Ya traducido
+      image: datosRaw.imagen,
+      tipo: datosRaw.tipo,
+      tipo_display: datosRaw.tipo_display, // ✅ Ya traducido
+      
+      // Datos adicionales
+      puntaje: "4.5",
+      location: datosRaw.ubicacion || 'Ubicación no especificada',
+      
+      // Horario
+      horario_inicio: datosRaw.horario_inicio,
+      horario_fin: datosRaw.horario_fin,
+      horario: datosRaw.horario_inicio && datosRaw.horario_fin 
+        ? `${datosRaw.horario_inicio} - ${datosRaw.horario_fin}` 
+        : null,
+      
+      // ✅ Procesar actividades ya traducidas
+      actividades: datosRaw.actividades 
+        ? (typeof datosRaw.actividades === 'string' 
+            ? datosRaw.actividades.split(',').map(act => ({ label: act.trim() }))
+            : [])
+        : [],
+      
+      // ✅ Procesar recomendaciones ya traducidas
+      recomendaciones: datosRaw.recomendaciones
+        ? (typeof datosRaw.recomendaciones === 'string'
+            ? datosRaw.recomendaciones.split(',').map(reco => ({ caption: reco.trim() }))
+            : [])
+        : []
+    };
+  }
+
+  // Si no vienen traducidos, procesar como datos originales
+  console.log('⚠️ Procesando datos sin traducir');
+  
+  let imagenFinal = datosRaw.imagen_url || datosRaw.image || datosRaw.imagen || datosRaw.Img || null;
   if (imagenFinal && !imagenFinal.startsWith("http")) {
     if (!imagenFinal.startsWith("/")) {
       imagenFinal = "/" + imagenFinal;
@@ -21,121 +66,48 @@ const transformarDatosSitio = (datosRaw) => {
     imagenFinal = BASE_URL + imagenFinal;
   }
 
-  // Procesar horario según el tipo
   let horarioFinal = datosRaw.horario;
-  console.log('Horario inicial:', horarioFinal);
-  
   if (!horarioFinal) {
-    console.log('Buscando horarios en campos específicos...');
-    console.log('HoraI_Hotel:', datosRaw.HoraI_Hotel, 'HoraF_Hotel:', datosRaw.HoraF_Hotel);
-    console.log('HoraI_Rest:', datosRaw.HoraI_Rest, 'HoraF_Rest:', datosRaw.HoraF_Rest);
-    console.log('HoraI_Siti:', datosRaw.HoraI_Siti, 'HoraF_Siti:', datosRaw.HoraF_Siti);
-    
     if (datosRaw.HoraI_Hotel && datosRaw.HoraF_Hotel) {
       horarioFinal = `${datosRaw.HoraI_Hotel} - ${datosRaw.HoraF_Hotel}`;
-      console.log('Horario hotel asignado:', horarioFinal);
     } else if (datosRaw.HoraI_Rest && datosRaw.HoraF_Rest) {
       horarioFinal = `${datosRaw.HoraI_Rest} - ${datosRaw.HoraF_Rest}`;
-      console.log('Horario restaurante asignado:', horarioFinal);
     } else if (datosRaw.HoraI_Siti && datosRaw.HoraF_Siti) {
       horarioFinal = `${datosRaw.HoraI_Siti} - ${datosRaw.HoraF_Siti}`;
-      console.log('Horario sitio asignado:', horarioFinal);
     }
   }
 
-  // DETERMINAR EL TIPO Y BOTÓN DE RESERVA
-  let tipo = 'sitio_turistico'; // Default
-  let mostrarBotonReserva = false;
-  let esReservable = false;
-
-  // Detectar tipo basado en los campos presentes
-  if (datosRaw.Nom_Hotel || datosRaw.Precio_Hotel || datosRaw.Tel_Hotel || datosRaw.HoraI_Hotel) {
+  let tipo = 'sitio_turistico';
+  if (datosRaw.Nom_Hotel || datosRaw.Precio_Hotel) {
     tipo = 'hotel';
-    mostrarBotonReserva = true;
-    esReservable = true;
-    console.log(' Detectado como HOTEL');
-  } else if (datosRaw.Nom_Rest || datosRaw.Tel_Rest || datosRaw.HoraI_Rest || datosRaw.Tipo_Comida_Rest) {
+  } else if (datosRaw.Nom_Rest || datosRaw.Tel_Rest) {
     tipo = 'restaurante';
-    mostrarBotonReserva = true;
-    esReservable = true;
-    console.log('Detectado como RESTAURANTE');
-  } else if (datosRaw.Nom_Siti || datosRaw.Activi_Siti) {
-    tipo = 'sitio_turistico';
-    mostrarBotonReserva = false;
-    esReservable = false;
-    console.log('Detectado como SITIO TURÍSTICO');
   }
 
-  console.log('Tipo detectado:', tipo);
-  console.log('Mostrar botón reserva:', mostrarBotonReserva);
-  console.log('Es reservable:', esReservable);
-
-  const datosTransformados = {
-    // Campos que usa PlantillaSitio
+  return {
     Id_Siti: datosRaw.Id_Hotel || datosRaw.Id_Rest || datosRaw.Id_Siti,
     id: datosRaw.Id_Hotel || datosRaw.Id_Rest || datosRaw.Id_Siti,
     image: imagenFinal,
     title: datosRaw.Nom_Hotel || datosRaw.Nom_Rest || datosRaw.Nom_Siti,
     nombre: datosRaw.Nom_Hotel || datosRaw.Nom_Rest || datosRaw.Nom_Siti,
-    puntaje: datosRaw.puntaje || datosRaw.rating || "4.5", // Default
-    location: datosRaw.Nom_Zon || datosRaw.zona || datosRaw.ubicacion,
     descripcion: datosRaw.Descrip_Hotel || datosRaw.Descrip_Rest || datosRaw.Descrip_Siti,
-    horario: horarioFinal,
-    horario_inicio: datosRaw.HoraI_Hotel || datosRaw.HoraI_Rest || datosRaw.HoraI_Siti,
-    horario_fin: datosRaw.HoraF_Hotel || datosRaw.HoraF_Rest || datosRaw.HoraF_Siti,
-    telefono: datosRaw.Tel_Hotel || datosRaw.Tel_Rest || datosRaw.Tel_Siti,
-    
-    // Configuración de tipo y reserva
     tipo: tipo,
-    mostrarBotonReserva: mostrarBotonReserva,
-    esReservable: esReservable,
-    
-    // Campos específicos de hotel
-    tipo_habitacion: datosRaw.Tipo_Hab_Hotel,
-    cantidad_personas: datosRaw.Capacidad_Hotel || datosRaw.Capacidad_Rest,
-    
-    // Campos específicos de restaurante
-    tipoComida: datosRaw.Tipo_Comida_Rest,
-    precioPromedio: datosRaw.Precio_Prom_Rest,
-    
-    // Campos para sitios turísticos
-    precios: datosRaw.Precio_Entra_Siti ? [datosRaw.Precio_Entra_Siti] : [],
+    horario: horarioFinal,
     actividades: datosRaw.Activi_Siti ? 
       datosRaw.Activi_Siti.split(',').map(act => ({ label: act.trim() })) : [],
-      recomendaciones: datosRaw.Recomendacione_Siti 
-      ? datosRaw.Recomendacione_Siti.split(',').map(reco => ({
-          caption: reco.trim(), 
-        }))
+    recomendaciones: datosRaw.Recomendacione_Siti 
+      ? datosRaw.Recomendacione_Siti.split(',').map(reco => ({ caption: reco.trim() }))
       : [],
-    
-    // Datos adicionales
-    zona: datosRaw.Nom_Zon || datosRaw.zona,
-    precio: datosRaw.Precio_Hotel,
-    servicios: datosRaw.Servicios_Hotel,
-    categoria: datosRaw.Categoria_Hotel,
-    dificultad: datosRaw.Dificultad_Siti,
-    precioEntrada: datosRaw.Precio_Entra_Siti
   };
-
-  console.log('=== DATOS TRANSFORMADOS FINALES ===');
-  console.log('ID:', datosTransformados.id);
-  console.log('Nombre:', datosTransformados.title);
-  console.log('Tipo:', datosTransformados.tipo);
-  console.log('Mostrar botón reserva:', datosTransformados.mostrarBotonReserva);
-  console.log('Es reservable:', datosTransformados.esReservable);
-  console.log('Objeto completo:', JSON.stringify(datosTransformados, null, 2));
-
-  return datosTransformados;
 };
 
-
-
-
+// ✅ COMPONENTE PLANTILLA SITIO
 const PlantillaSitio = (props) => {
-  console.log('=== PROPS RECIBIDAS EN PLANTILLA SITIO ===');
-  console.log('Tipo:', props.tipo);
-  console.log('Navigation disponible:', !!props.navigation);
-  console.log('Props completas:', JSON.stringify(props, null, 2));
+  const { t, i18n } = useTranslation();
+  
+  console.log('=== RENDERIZANDO PLANTILLA SITIO ===');
+  console.log('Idioma actual:', i18n.language);
+  console.log('Datos recibidos:', props);
 
   const {
     Id_Siti,
@@ -145,9 +117,6 @@ const PlantillaSitio = (props) => {
     location,
     descripcion,
     horario,
-    horario_inicio,
-    horario_fin,
-    precios = [],
     actividades = [],
     recomendaciones = [],
     tipo = 'sitio_turistico',
@@ -155,7 +124,6 @@ const PlantillaSitio = (props) => {
     cantidad_personas,
     navigation
   } = props;
-
 
   const colors = {
     primary: '#101C5D',
@@ -166,9 +134,18 @@ const PlantillaSitio = (props) => {
     vibrant: '#F97C7C',
   };
 
-  const displayNombre = title || props.nombre || props.Nom_Siti || props.Nom_Hotel || props.Nom_Rest || 'No especificado';
-  const displayDescripcion = descripcion || props.Descrip_Siti || props.Descrip_Hotel || props.Descrip_Rest || 'No especificado';
-  const displayUbicacion = location || props.ubicacion || props.Ubi_Siti || 'No especificado';
+  // ✅ Usar datos ya traducidos del backend
+  const displayNombre = title || props.nombre || t('no_specified') || 'Sin nombre';
+  const displayDescripcion = descripcion || props.descripcion || t('no_specified') || 'Sin descripción';
+  const displayUbicacion = location || props.ubicacion || t('no_specified') || 'Sin ubicación';
+  const displayTipo = props.tipo_display || 'Lugar';
+
+  console.log('📍 Renderizando:');
+  console.log('- Nombre:', displayNombre);
+  console.log('- Descripción (length):', displayDescripcion?.length);
+  console.log('- Tipo:', displayTipo);
+  console.log('- Actividades:', actividades?.length);
+  console.log('- Recomendaciones:', recomendaciones?.length);
 
   let displayImagenObj;
   if (image && typeof image === 'string' && image.length > 0) {
@@ -179,15 +156,32 @@ const PlantillaSitio = (props) => {
     displayImagenObj = require('../../assets/default-image.png');
   }
 
-  console.log('Tipo de lugar:', tipo);
-  console.log('Horario:', horario);
-  console.log('Actividades:', actividades);
-  console.log('Recomendaciones:', recomendaciones);
+  const getScheduleTitle = () => {
+    switch(tipo) {
+      case 'hotel':
+        return t('attendance_hours') || 'Horarios de atención:';
+      case 'restaurante':
+        return t('service_hours') || 'Horarios de servicio:';
+      default:
+        return t('visit_hours') || 'Horarios de visita:';
+    }
+  };
+
+  const getReserveButtonText = () => {
+    switch(tipo) {
+      case 'hotel':
+        return t('reserve_hotel') || 'Reservar Hotel';
+      case 'restaurante':
+        return t('reserve_table') || 'Reservar Mesa';
+      default:
+        return t('reserve') || 'Reservar';
+    }
+  };
 
   return (
     <View style={[tw`flex-1`, { backgroundColor: colors.neutralLight }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
-        {/* Imagen principal con sombra sutil */}
+        {/* Imagen principal */}
         <View style={{ shadowColor: colors.neutralDark, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 5 }}>
           <Image
             source={displayImagenObj}
@@ -198,13 +192,15 @@ const PlantillaSitio = (props) => {
 
         {/* Contenido principal */}
         <View style={[tw`bg-white rounded-t-[25px] px-5 pt-6 pb-10 -mt-6`, { shadowColor: colors.neutralDark, shadowOpacity: 0.1, shadowRadius: 6 }]}>
+          
+          {/* ✅ Título ya traducido */}
           <Text style={{ fontSize: 26, fontWeight: '700', color: colors.primary, marginBottom: 6 }}>
             {displayNombre} <Ionicons name="leaf-outline" size={20} color={colors.secondary} />
           </Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
             <Text style={{ color: colors.complementary, fontWeight: '600', marginRight: 12 }}>
-              ⭐ {puntaje}
+              ⭐ {puntaje || "4.5"}
             </Text>
             <Ionicons name="location-outline" size={18} color={colors.neutralDark} />
             <Text style={{ color: colors.neutralDark, marginLeft: 4, fontSize: 14 }}>
@@ -212,6 +208,7 @@ const PlantillaSitio = (props) => {
             </Text>
           </View>
 
+          {/* ✅ Descripción ya traducida */}
           <Text style={{ fontSize: 16, lineHeight: 24, color: colors.neutralDark, marginBottom: 18 }}>
             {displayDescripcion}
           </Text>
@@ -240,8 +237,8 @@ const PlantillaSitio = (props) => {
                     descripcion: displayDescripcion,
                     imagen: displayImagenObj.uri || null,
                     ubicacion: displayUbicacion,
-                    horario_inicio: horario_inicio,
-                    horario_fin: horario_fin,
+                    horario_inicio: props.horario_inicio,
+                    horario_fin: props.horario_fin,
                     tipo_habitacion: tipo_habitacion,
                     cantidad_personas: cantidad_personas,
                   },
@@ -249,18 +246,16 @@ const PlantillaSitio = (props) => {
               }
             >
               <Text style={{ color: 'white', fontWeight: '700', fontSize: 18 }}>
-                Reservar {tipo === 'hotel' ? 'Hotel' : 'Mesa'}
+                {getReserveButtonText()}
               </Text>
             </TouchableOpacity>
           )}
 
-          {/* Horario - Se muestra para todos los tipos */}
+          {/* Horario */}
           {horario && horario !== 'null - null' && horario !== ' - ' && (
             <>
               <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 6 }}>
-                {tipo === 'hotel' ? 'Horarios de atención:' : 
-                 tipo === 'restaurante' ? 'Horarios de servicio:' : 
-                 'Horarios de visita:'}
+                {getScheduleTitle()}
               </Text>
               <Text style={{ fontSize: 14, color: colors.neutralDark, marginBottom: 18 }}>
                 {horario}
@@ -274,7 +269,7 @@ const PlantillaSitio = (props) => {
               {tipo_habitacion && (
                 <>
                   <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 6 }}>
-                    Tipos de habitación disponibles:
+                    {t('available_room_types') || 'Tipos de habitación disponibles'}:
                   </Text>
                   <Text style={{ fontSize: 14, color: colors.neutralDark, marginBottom: 18 }}>
                     {tipo_habitacion}
@@ -284,117 +279,105 @@ const PlantillaSitio = (props) => {
               {cantidad_personas && (
                 <>
                   <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 6 }}>
-                    Capacidad máxima:
+                    {t('max_capacity') || 'Capacidad máxima'}:
                   </Text>
                   <Text style={{ fontSize: 14, color: colors.neutralDark, marginBottom: 18 }}>
-                    {cantidad_personas} personas
+                    {cantidad_personas} {t('people') || 'personas'}
                   </Text>
                 </>
               )}
             </>
           )}
 
-          {/* Actividades - solo para sitios turísticos */}
-          {tipo === 'sitio_turistico' && (
+          {/* ✅ Actividades ya traducidas - solo para sitios turísticos */}
+          {tipo === 'sitio_turistico' && actividades && actividades.length > 0 && (
             <>
               <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, marginBottom: 12 }}>
-                Atrévete a probar estas actividades:
+                {t('dare_to_try_activities') || 'Atrévete a probar estas actividades'}:
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 24 }}>
-                {actividades.length > 0 ? (
-                  actividades.map((act, i) => (
-                    <View
-                      key={i}
+                {actividades.map((act, i) => (
+                  <View
+                    key={i}
+                    style={{
+                      width: 72,
+                      alignItems: 'center',
+                      marginRight: 10,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Ionicons name="ribbon-outline" size={28} color={colors.complementary} />
+                    <Text
                       style={{
-                        width: 72,
-                        alignItems: 'center',
-                        marginRight: 10,
-                        marginBottom: 12,
+                        marginTop: 6,
+                        textAlign: 'center',
+                        fontSize: 13,
+                        color: colors.neutralDark,
+                        fontWeight: '600',
                       }}
+                      numberOfLines={2}
                     >
-                      <Ionicons name="ribbon-outline" size={28} color={colors.complementary} />
-                      <Text
-                        style={{
-                          marginTop: 6,
-                          textAlign: 'center',
-                          fontSize: 13,
-                          color: colors.neutralDark,
-                          fontWeight: '600',
-                        }}
-                        numberOfLines={2}
-                      >
-                        {act.label || 'Actividad desconocida'}
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <Text style={{ color: colors.neutralDark, fontStyle: 'italic' }}>
-                    No hay actividades disponibles
-                  </Text>
-                )}
+                      {act.label || t('unknown_activity') || 'Actividad'}
+                    </Text>
+                  </View>
+                ))}
               </View>
             </>
           )}
 
-          {/* Recomendaciones - solo para sitios turísticos */}
-          {tipo === 'sitio_turistico' && (
+          {/* ✅ Recomendaciones ya traducidas - solo para sitios turísticos */}
+          {tipo === 'sitio_turistico' && recomendaciones && recomendaciones.length > 0 && (
             <>
               <Text style={{ fontWeight: '700', fontSize: 18, color: colors.primary, textAlign: 'center', marginBottom: 12 }}>
-                ¡Vive una mejor experiencia, con estas recomendaciones!
+                {t('live_better_experience') || '¡Vive una mejor experiencia!'}
               </Text>
-              {recomendaciones.length > 0 ? (
-                <FlatList
-                  horizontal
-                  data={recomendaciones}
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(_, index) => index.toString()}
-                  contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}
-                  renderItem={({ item }) => {
-                    let recoImg = item.image;
-                    if (recoImg && !recoImg.startsWith("http")) {
-                      recoImg = BASE_URL + recoImg.replace(/^\/+/, "");
-                    }
-                    return (
-                      <View
+              <FlatList
+                horizontal
+                data={recomendaciones}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(_, index) => index.toString()}
+                contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}
+                renderItem={({ item }) => {
+                  let recoImg = item.image;
+                  if (recoImg && !recoImg.startsWith("http")) {
+                    recoImg = BASE_URL + recoImg.replace(/^\/+/, "");
+                  }
+                  return (
+                    <View
+                      style={{
+                        width: screenWidth * 0.3,
+                        marginRight: 12,
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        backgroundColor: colors.neutralLight,
+                        paddingBottom: 8,
+                      }}
+                    >
+                      <Image
+                        source={recoImg ? { uri: recoImg } : require('../../assets/reco.png')}
+                        style={{ width: '100%', height: 96 }}
+                        resizeMode="cover"
+                      />
+                      <Text
                         style={{
-                          width: screenWidth * 0.3,
-                          marginRight: 12,
-                          borderRadius: 14,
-                          overflow: 'hidden',
-                          backgroundColor: colors.neutralLight,
-                          paddingBottom: 8,
+                          marginTop: 8,
+                          color: colors.neutralDark,
+                          fontWeight: '600',
+                          fontSize: 12,
+                          textAlign: 'center',
                         }}
+                        numberOfLines={2}
                       >
-                        <Image
-                          source={recoImg ? { uri: recoImg } : require('../../assets/reco.png')}
-                          style={{ width: '100%', height: 96 }}
-                          resizeMode="cover"
-                        />
-                        <Text
-                          style={{
-                            marginTop: 8,
-                            color: colors.neutralDark,
-                            fontWeight: '600',
-                            fontSize: 12,
-                            textAlign: 'center',
-                          }}
-                          numberOfLines={2}
-                        >
-                          {item.caption || 'Sin descripción'}
-                        </Text>
-                      </View>
-                    );
-                  }}
-                />
-              ) : (
-                <Text style={{ color: colors.neutralDark, fontStyle: 'italic', marginBottom: 24, textAlign: 'center' }}>
-                  No hay recomendaciones por el momento
-                </Text>
-              )}
+                        {item.caption || t('no_description') || 'Sin descripción'}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
             </>
           )}
 
-         {/* Para sitios turísticos */}
+         {/* Comentarios */}
          <Comentario Id_Siti={Id_Siti} tipo={tipo} />
         </View>
       </ScrollView>

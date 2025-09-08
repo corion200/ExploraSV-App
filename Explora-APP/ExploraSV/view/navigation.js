@@ -20,6 +20,7 @@ import MisReservas from './MisReservas';
 import HelpSupport from './helpSupport';
 import DetalleReserva from './components/DetalleReserva';
 import DetalleLugar from './components/DetalleLugar';
+import Configuraciones from './config';
 import Verify from './Verify';
 
 import * as SecureStore from 'expo-secure-store';
@@ -60,6 +61,7 @@ export default function Navigation() {
         <Stack.Screen name="Payment" component={Payment} />
         <Stack.Screen name="Reservacion" component={Reservacion} />
         <Stack.Screen name="Verify" component={Verify} />
+        <Stack.Screen name="Configuraciones" component={Configuraciones} />
       </Stack.Navigator>
     </NavigationContainer>
     <Toast config={toastConfig}/> 

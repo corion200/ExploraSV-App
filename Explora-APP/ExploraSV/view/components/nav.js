@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation,useNavigationState  } from '@react-navigation/native';
-
-
-
+import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import tw from 'twrnc';
 
 /**
- * @param {Object} props - Propiedades del componente
- * @param {string} [props.initialTab='home'] - Pestaña activa inicial
- * @param {function} [props.onTabChange] - Función que se llama al cambiar de pestaña
- * @param {string} [props.activeColor='#3b82f6'] - Color para la pestaña activa
- * @param {string} [props.inactiveColor='#6b7280'] - Color para pestañas inactivas
- * @param {number} [props.iconSize=24] - Tamaño de los iconos
- * @returns {React.Component} Componente de barra de navegación
+ * BottomNavBar con soporte i18n
  */
 const BottomNavBar = ({
   initialTab = 'Index',
@@ -25,15 +17,16 @@ const BottomNavBar = ({
 }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const navigation = useNavigation();
+  const { t } = useTranslation(); // <-- Hook para traducciones
 
   const menuItems = [
-    { id: 'Index', icon: 'home', label: 'Inicio' },
-    { id: 'Search', icon: 'search', label: 'Explorar' },
-    { id: 'ChatScreen', icon: 'chatbox-ellipses-outline', label: 'Asistente' },
-    { id: 'MisReservas', icon: 'calendar', label: 'Reservar' },
-    { id: 'Perfil', icon: 'person-circle-outline', label: 'Perfil' },
-
+    { id: 'Index', icon: 'home', label: t('Inicio') },
+    { id: 'Search', icon: 'search', label: t('Explorar') },
+    { id: 'ChatScreen', icon: 'chatbox-ellipses-outline', label: t('Asistente') },
+    { id: 'MisReservas', icon: 'calendar', label: t('Reservar') },
+    { id: 'Perfil', icon: 'person-circle-outline', label: t('Perfil') },
   ];
+
   const handleTabPress = (tabId) => {
     setActiveTab(tabId);
     if (onTabChange) {
@@ -42,10 +35,12 @@ const BottomNavBar = ({
       navigation.navigate(tabId); 
     }
   };
+
   const currentRoute = useNavigationState((state) => {
     const route = state.routes[state.index];
     return route.name;
   });
+
   return (
     <View style={[
       tw` bg-white border-t border-gray-200 flex-row justify-between items-center h-28 px-2`,
@@ -53,7 +48,6 @@ const BottomNavBar = ({
     ]}>
       {menuItems.map((item) => {
         const isActive = currentRoute === item.id;
-        
         return (
           <TouchableOpacity
             key={item.id}
@@ -83,8 +77,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    elevation: 8, // Para sombra en Android
-    shadowColor: '#000', // Para sombra en iOS
+    elevation: 8,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
